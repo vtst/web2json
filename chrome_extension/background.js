@@ -3,7 +3,7 @@
 var w2j = {bg: {}};
 
 // *************************************************************************
-// Main functions
+// Interaction with content page
 
 w2j.bg.executeScripts = function(tabId, scripts, callback) {
   function iter(i) {
@@ -16,23 +16,27 @@ w2j.bg.executeScripts = function(tabId, scripts, callback) {
   iter(0);
 };
 
-w2j.bg.extract = function(tab) {
-  w2j.bg.executeScripts(tab.id, [
+w2j.bg.executeQueries = function(tabId, queries, callback) {
+  w2j.bg.executeScripts(tabId, [
     {file: 'utils.js'},
     {file: 'content_script.js'}
   ], function() {
-    var port = chrome.tabs.connect(tab.id, {name: 'w2j-cs'});
-    port.onMessage.addListener(function(msg) {
-      alert('BG: ' + JSON.stringify(msg, null, 2));
-    });
-    port.postMessage({
-      queries: [
-        {
-          type: 'querySelectorAll',
-          selector: 'a/[href]'
-        }
-      ]
-    });
+    chrome.tabs.sendMessage(tabId, {queries: queries}, callback);
+  });
+};
+
+// *************************************************************************
+// Main functions
+
+w2j.bg.extract = function(tab) {
+  var queries = [
+    {
+      type: 'querySelectorAll',
+      selector: 'a/[href]'
+    }
+  ];
+  w2j.bg.executeQueries(tab.id, queries, function(response) {
+    alert('BG: ' + JSON.stringify(response, null, 2));
   });
 };
 
