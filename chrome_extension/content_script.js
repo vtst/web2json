@@ -3,7 +3,41 @@
 // This content script provides an API to extract content from a web page within
 // a Chrome tab
 
-var w2j = {cs: {}};
+var w2j = w2j || {};
+w2j.cs = {};
+
+// *************************************************************************
+// Query execution
+
+w2j.cs.getAttributes = function(element) {
+  var result = {};
+  w2j.utils.forEach(element.attributes, function(attribute) {
+    result[attribute.nodeName] = attribute.nodeValue;
+  });
+  return result;
+};
+
+w2j.cs.processElementForQuery = function(query, element) {
+  return {
+    textContent: element.textContent,
+    innerHTML: element.innerHTML,
+    attributes: w2j.cs.getAttributes(element)
+  }
+};
+
+w2j.cs.executeQuery = function(query) {
+  switch (query.type) {
+  case 'querySelector':
+    var element = document.querySelector(query.selector);
+    return w2j.cs.processElementForQuery(query, element);
+    ;;
+  case 'querySelectorAll':
+    var elements = document.querySelectorAll(query.selector);
+    return w2j.utils.map(elements,
+                         w2j.cs.processElementForQuery.bind(null, query));
+    ;;
+  }
+};
 
 // *************************************************************************
 // Messaging with the background page
@@ -24,6 +58,11 @@ w2j.cs.postMessage = function(msg) {
 };
 
 w2j.cs.onMessage = function(msg) {
+  if (msg.queries) {
+    w2j.cs.postMessage({
+      results: w2j.utils.map(msg.queries, w2j.cs.executeQuery)
+    });
+  }
 };
 
 // *************************************************************************
