@@ -27,8 +27,9 @@ w2j.bg.extract = function(tab) {
     });
     port.postMessage({
       queries: [
-        {type: 'querySelectorAll',
-         selector: 'a'
+        {
+          type: 'querySelectorAll',
+          selector: 'a/[href]'
         }
       ]
     });

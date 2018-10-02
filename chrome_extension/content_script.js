@@ -18,21 +18,45 @@ w2j.cs.getAttributes = function(element) {
 };
 
 w2j.cs.processElementForQuery = function(query, element) {
-  return {
-    textContent: element.textContent,
-    innerHTML: element.innerHTML,
-    attributes: w2j.cs.getAttributes(element)
+  var selectorRHS = w2j.cs.getSelectorRHS(query.selector);
+  if (!selectorRHS) selectorRHS = '*';
+  switch (selectorRHS) {
+  case '*':
+    return {
+      textContent: element.textContent,
+      innerHTML: element.innerHTML,
+      attributes: w2j.cs.getAttributes(element)
+    };
+  case 'textContent':
+    return element.textContent;
+  case 'innerHTML':
+    return element.innerHTML;
+  default:
+    if (selectorRHS.substr(0, 1) == '[' &&
+        selectorRHS.substr(selectorRHS.length -1, 1) == ']') {
+      return element.getAttribute(
+        selectorRHS.substr(1, selectorRHS.length - 2));
+    }
   }
+};
+
+w2j.cs.getSelectorLHS = function(selector) {
+  return selector.split('/')[0];
+};
+
+w2j.cs.getSelectorRHS = function(selector) {
+  return selector.split('/')[1];
 };
 
 w2j.cs.executeQuery = function(query) {
   switch (query.type) {
   case 'querySelector':
-    var element = document.querySelector(query.selector);
+    var element = document.querySelector(w2j.cs.getSelectorLHS(query.selector));
     return w2j.cs.processElementForQuery(query, element);
     ;;
   case 'querySelectorAll':
-    var elements = document.querySelectorAll(query.selector);
+    var elements = document.querySelectorAll(
+      w2j.cs.getSelectorLHS(query.selector));
     return w2j.utils.map(elements,
                          w2j.cs.processElementForQuery.bind(null, query));
     ;;
@@ -64,10 +88,3 @@ w2j.cs.onMessage = function(msg) {
     });
   }
 };
-
-// *************************************************************************
-
-
-document.body.addEventListener('click', function() {
-  w2j.cs.postMessage({text: 'click'});
-}, true); 
