@@ -6,11 +6,10 @@ w2j.bg = {};
 // *************************************************************************
 // Promisify
 
-w2j.chrome = {tabs: {}};
-
-w2j.chrome.tabs.update = w2j.promisify(chrome.tabs.update);
-w2j.chrome.tabs.executeScript = w2j.promisify(chrome.tabs.executeScript);
-w2j.chrome.tabs.sendMessage = w2j.promisify(chrome.tabs.sendMessage);
+var chromp = {tabs: {}};
+chromp.tabs.update = w2j.promisify(chrome.tabs.update);
+chromp.tabs.executeScript = w2j.promisify(chrome.tabs.executeScript);
+chromp.tabs.sendMessage = w2j.promisify(chrome.tabs.sendMessage);
 
 // *************************************************************************
 // Await for tab loaded
@@ -59,15 +58,15 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
 // Main functions
 
 w2j.bg.injectScripts = async function(tab) {
-  await w2j.chrome.tabs.executeScript(tab.id, {file: 'utils.js'});
-  await w2j.chrome.tabs.executeScript(tab.id, {file: 'content_script.js'});
+  await chromp.tabs.executeScript(tab.id, {file: 'utils.js'});
+  await chromp.tabs.executeScript(tab.id, {file: 'content_script.js'});
 };
 
 w2j.bg.get = async function(tab, url, obj) {
-  await w2j.chrome.tabs.update(tab.id, {url: url});
+  await chromp.tabs.update(tab.id, {url: url});
   await w2j.bg.tabStatusUpdated(tab.id, 'complete');
   await w2j.bg.injectScripts(tab.id);
-  return await w2j.chrome.tabs.sendMessage(tab.id, {objectToMap: obj});
+  return await chromp.tabs.sendMessage(tab.id, {objectToMap: obj});
 };
 
 // *************************************************************************
