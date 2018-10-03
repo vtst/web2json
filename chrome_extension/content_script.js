@@ -42,7 +42,6 @@ w2j.cs.getAttributes = function(element) {
 @return {*}
 */
 w2j.cs.processElementForQuerySelector = function(parsedSelector, element) {
-  if (!parsedSelector.extension) parsedSelector.extension = '*';
   switch (parsedSelector.extension) {
   case '*':
     return {
@@ -59,27 +58,32 @@ w2j.cs.processElementForQuerySelector = function(parsedSelector, element) {
         parsedSelector.extension.substr(parsedSelector.extension.length -1, 1) == ']') {
       return element.getAttribute(
         parsedSelector.extension.substr(1, parsedSelector.extension.length - 2));
+    } else {
+      return element;
     }
   }
 };
 
 /**
+@param {Node} rootNode
 @param {string} selector
 @return {*}
 */
-w2j.cs.get = function(selector) {
+w2j.cs.get = function(rootNode, selector) {
   var parsedSelector = w2j.cs.parseSelector(selector);
-  var element = document.querySelector(parsedSelector.body);
-  return w2j.cs.processElementForQuerySelector(parsedSelector, element);
+  var element = parsedSelector.body ? rootNode.querySelector(parsedSelector.body) : rootNode;
+  if (element) return w2j.cs.processElementForQuerySelector(parsedSelector, element);
+  else return null;
 };
 
 /**
+@param {Node} rootNode
 @param {string} selector
 @return {Array.<*>}
 */
-w2j.cs.getAll = function(selector) {
+w2j.cs.getAll = function(rootNode, selector) {
   var parsedSelector = w2j.cs.parseSelector(selector);
-  var elements = document.querySelectorAll(parsedSelector.body);
+  var elements = parsedSelector.body ? rootNode.querySelectorAll(parsedSelector.body) : [rootNode];
   return w2j.utils.map(
     elements,
     w2j.cs.processElementForQuerySelector.bind(null, parsedSelector));
@@ -102,15 +106,27 @@ w2j.cs.mapObject = function(obj, fn, opt_context) {
   }
 };
 
-w2j.cs.map = function(root) {
-  return w2j.cs.mapObject(root, function(node) {
-    switch (node._w2j_) {
+w2j.cs.map = function(rootNode, rootObject) {
+  return w2j.cs.mapObject(rootObject, function(object) {
+    switch (object._w2j_) {
     case 'get':
-      return w2j.cs.get(node.selector);
+      var got = w2j.cs.get(rootNode, object.selector);
+      if (got && object.cont) {
+        return w2j.cs.map(got, object.cont);
+      } else {
+        return got;
+      }
     case 'getAll':
-      return w2j.cs.getAll(node.selector);
+      var gots = w2j.cs.getAll(rootNode, object.selector);
+      if (object.cont) {
+        return w2j.utils.map(gots, function(got) {
+          return w2j.cs.map(got, object.cont);
+        });
+      } else {
+        return gots;
+      }
     default:
-      return node;
+      return object;
     }
   });
 };
@@ -121,7 +137,7 @@ w2j.cs.map = function(root) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.objectToMap) {
     sendResponse({
-      mappedObject: w2j.cs.map(request.objectToMap)
+      mappedObject: w2j.cs.map(document, request.objectToMap)
     });
   }
 

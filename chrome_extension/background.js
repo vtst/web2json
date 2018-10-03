@@ -73,17 +73,28 @@ w2j.bg.get = async function(tab, url, obj) {
 // Context menus
 
 chrome.contextMenus.create({
-  id: 'extract',
+  id: 'w2j-extract',
   title: 'Extract Web to JSON'
 });
 
 chrome.contextMenus.onClicked.addListener(async function(info, tab) {
-  if (info.menuItemId == 'extract') {
+  if (info.menuItemId == 'w2j-extract') {
     var obj = {
       my_name: 'Vincent Simonet',
-      hrefs: W2J.getAll('a/[href]')
+      hrefs: W2J.getAll('div.rc h3.r a/[href]'),
+      texts: W2J.getAll('div.rc h3.r a/textContent')
     };
-    var mappedObj = await w2j.bg.get(tab, 'http://www.vtst.net/', obj);
+    var obj = {
+      results: W2J.getAll('div.rc h3.r', {
+        href: W2J.get('a/[href]'),
+        text: W2J.get('a/textContent')
+      }),
+      next: W2J.get('a.pn', {
+        href: W2J.get('/[href]'),
+        text: W2J.get('/textContent')
+      })
+    }
+    var mappedObj = await w2j.bg.get(tab, 'https://www.google.com/search?q=vincent+simonet', obj);
     console.log(mappedObj);
   }
 });
