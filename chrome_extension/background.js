@@ -55,7 +55,7 @@ w2j.bg.get = async function(tab, url, obj) {
     my_name: 'Vincent Simonet',
     hrefs: W2J.getAll('a/[href]')
   }
-  chrome.tabs.sendMessage(tab.id, {get: input}, function(response) {
+  chrome.tabs.sendMessage(tab.id, {objectToMap: input}, function(response) {
     console.log(response);
     alert('BG2: ' + JSON.stringify(response, null, 2));
   });

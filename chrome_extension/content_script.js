@@ -9,6 +9,12 @@ w2j.cs = {};
 // *************************************************************************
 // Query execution
 
+w2j.cs.parseSelector = function(selector) {
+  var i = selector.lastIndexOf('/');
+  if (i < 0) return {body: selector, extension: ''};
+  else return {body: selector.substring(0, i), extension: selector.substring(i + 1)};
+};
+
 w2j.cs.getAttributes = function(element) {
   var result = {};
   w2j.utils.forEach(element.attributes, function(attribute) {
@@ -17,10 +23,9 @@ w2j.cs.getAttributes = function(element) {
   return result;
 };
 
-w2j.cs.processElementForQuery = function(query, element) {
-  var selectorRHS = w2j.cs.getSelectorRHS(query.selector);
-  if (!selectorRHS) selectorRHS = '*';
-  switch (selectorRHS) {
+w2j.cs.processElementForQuerySelector = function(parsedSelector, element) {
+  if (!parsedSelector.extension) parsedSelector.extension = '*';
+  switch (parsedSelector.extension) {
   case '*':
     return {
       textContent: element.textContent,
@@ -32,75 +37,65 @@ w2j.cs.processElementForQuery = function(query, element) {
   case 'innerHTML':
     return element.innerHTML;
   default:
-    if (selectorRHS.substr(0, 1) == '[' &&
-        selectorRHS.substr(selectorRHS.length -1, 1) == ']') {
+    if (parsedSelector.extension.substr(0, 1) == '[' &&
+        parsedSelector.extension.substr(parsedSelector.extension.length -1, 1) == ']') {
       return element.getAttribute(
-        selectorRHS.substr(1, selectorRHS.length - 2));
+        parsedSelector.extension.substr(1, parsedSelector.extension.length - 2));
     }
   }
 };
 
-w2j.cs.getSelectorLHS = function(selector) {
-  return selector.split('/')[0];
+w2j.cs.get = function(selector) {
+  var parsedSelector = w2j.cs.parseSelector(selector);
+  var element = document.querySelector(parsedSelector.body);
+  return w2j.cs.processElementForQuerySelector(parsedSelector, element);
 };
 
-w2j.cs.getSelectorRHS = function(selector) {
-  return selector.split('/')[1];
-};
-
-w2j.cs.executeQuery = function(query) {
-  switch (query.type) {
-  case 'querySelector':
-    var element = document.querySelector(w2j.cs.getSelectorLHS(query.selector));
-    return w2j.cs.processElementForQuery(query, element);
-  case 'querySelectorAll':
-    var elements = document.querySelectorAll(
-      w2j.cs.getSelectorLHS(query.selector));
-    return w2j.utils.map(elements,
-                         w2j.cs.processElementForQuery.bind(null, query));
-  }
-};
-
-w2j.cs.executeQueries = function(queries) {
-  return w2j.utils.map(queries, w2j.cs.executeQuery);
+w2j.cs.getAll = function(selector) {
+  var parsedSelector = w2j.cs.parseSelector(selector);
+  var elements = document.querySelectorAll(parsedSelector.body);
+  return w2j.utils.map(
+    elements,
+    w2j.cs.processElementForQuerySelector.bind(null, parsedSelector));
 };
 
 // *************************************************************************
 // Extractor
 
-w2j.cs.get = function(obj) {
-  function map(node) {
-    if (typeof node === 'object') {
-      if (node instanceof Array) {
-        return w2j.utils.map(node, map);
-      } else if (!node._w2j_) {
-        return w2j.utils.mapObject(node, map);
-      } else {
-        switch (node._w2j_) {
-          case 'get':
-            return w2j.cs.executeQuery({type: 'querySelector', selector: node.selector});
-          case 'getAll':
-            return w2j.cs.executeQuery({type: 'querySelectorAll', selector: node.selector});
-        }
-      }
+w2j.cs.mapObject = function(obj, fn, opt_context) {
+  if (typeof obj === 'object') {
+    if (obj instanceof Array) {
+      return w2j.utils.map(obj, elt => { return w2j.cs.mapObject(elt, fn, opt_context); });
+    } else if (obj._w2j_) {
+      return fn.call(opt_context, obj);
+    } else {
+      return w2j.utils.mapObject(obj, elt => { return w2j.cs.mapObject(elt, fn, opt_context); });
     }
-    return node;
+  } else {
+    return obj;
   }
-  return map(obj);
+};
+
+w2j.cs.map = function(root) {
+  return w2j.cs.mapObject(root, function(node) {
+    switch (node._w2j_) {
+    case 'get':
+      return w2j.cs.get(node.selector);
+    case 'getAll':
+      return w2j.cs.getAll(node.selector);
+    default:
+      return node;
+    }
+  });
 };
 
 // *************************************************************************
 // Messaging with the background page
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.queries) {
+  if (request.objectToMap) {
     sendResponse({
-      results: w2j.cs.executeQueries(request.queries)
-    });
-  }
-  if (request.get) {
-    sendResponse({
-      result: w2j.cs.get(request.get)
+      mappedObject: w2j.cs.map(request.objectToMap)
     });
   }
 
