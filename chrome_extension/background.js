@@ -67,8 +67,7 @@ w2j.bg.get = async function(tab, url, obj) {
   await w2j.chrome.tabs.update(tab.id, {url: url});
   await w2j.bg.tabStatusUpdated(tab.id, 'complete');
   await w2j.bg.injectScripts(tab.id);
-  var response = await w2j.chrome.tabs.sendMessage(tab.id, {objectToMap: obj});
-  return response;
+  return await w2j.chrome.tabs.sendMessage(tab.id, {objectToMap: obj});
 };
 
 // *************************************************************************
