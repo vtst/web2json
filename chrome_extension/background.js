@@ -51,22 +51,15 @@ w2j.bg.get = async function(tab, url, obj) {
   await w2j.chrome.tabs.update(tab.id, {url: url});
   await w2j.bg.tabStatusUpdated(tab.id, 'complete');
   await w2j.bg.injectScripts(tab.id);
-  var queries = [
-    {
-      type: 'querySelectorAll',
-      selector: 'a/[href]'
-    }
-  ];
-  chrome.tabs.sendMessage(tab.id, {queries: queries}, function(response) {
+  var input = {
+    my_name: 'Vincent Simonet',
+    hrefs: W2J.getAll('a/[href]')
+  }
+  chrome.tabs.sendMessage(tab.id, {get: input}, function(response) {
+    console.log(response);
     alert('BG2: ' + JSON.stringify(response, null, 2));
   });
 };
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log(request);
-});
-
-
 
 // *************************************************************************
 // Context menus

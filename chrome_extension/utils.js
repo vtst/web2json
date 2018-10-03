@@ -18,6 +18,14 @@ w2j.utils.forEach = function(arr, fn, opt_obj) {
   }
 };
 
+w2j.utils.mapObject = function(obj, fn, opt_obj) {
+  var result = {};
+  for (var key in obj) {
+    result[key] = fn.call(opt_obj, obj[key], key);
+  }
+  return result;
+}
+
 // *************************************************************************
 // Promisify
 

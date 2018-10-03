@@ -53,18 +53,40 @@ w2j.cs.executeQuery = function(query) {
   case 'querySelector':
     var element = document.querySelector(w2j.cs.getSelectorLHS(query.selector));
     return w2j.cs.processElementForQuery(query, element);
-    ;;
   case 'querySelectorAll':
     var elements = document.querySelectorAll(
       w2j.cs.getSelectorLHS(query.selector));
     return w2j.utils.map(elements,
                          w2j.cs.processElementForQuery.bind(null, query));
-    ;;
   }
 };
 
 w2j.cs.executeQueries = function(queries) {
   return w2j.utils.map(queries, w2j.cs.executeQuery);
+};
+
+// *************************************************************************
+// Extractor
+
+w2j.cs.get = function(obj) {
+  function map(node) {
+    if (typeof node === 'object') {
+      if (node instanceof Array) {
+        return w2j.utils.map(node, map);
+      } else if (!node._w2j_) {
+        return w2j.utils.mapObject(node, map);
+      } else {
+        switch (node._w2j_) {
+          case 'get':
+            return w2j.cs.executeQuery({type: 'querySelector', selector: node.selector});
+          case 'getAll':
+            return w2j.cs.executeQuery({type: 'querySelectorAll', selector: node.selector});
+        }
+      }
+    }
+    return node;
+  }
+  return map(obj);
 };
 
 // *************************************************************************
@@ -75,8 +97,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse({
       results: w2j.cs.executeQueries(request.queries)
     });
-  } else {
-    sendResponse({msg: 'no response'});
   }
+  if (request.get) {
+    sendResponse({
+      result: w2j.cs.get(request.get)
+    });
+  }
+
 });
 chrome.runtime.sendMessage(null, {title: document.title});
