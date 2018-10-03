@@ -75,5 +75,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse({
       results: w2j.cs.executeQueries(request.queries)
     });
+  } else {
+    sendResponse({msg: 'no response'});
   }
 });
+chrome.runtime.sendMessage(null, {title: document.title});
