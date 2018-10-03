@@ -9,12 +9,25 @@ w2j.cs = {};
 // *************************************************************************
 // Query execution
 
+/**
+@typedef {{body: string, extension: string}}
+*/
+w2j.cs.ParsedSelector;
+
+/**
+@param {string} selector
+@return w2j.cs.ParsedSelector
+*/
 w2j.cs.parseSelector = function(selector) {
   var i = selector.lastIndexOf('/');
   if (i < 0) return {body: selector, extension: ''};
   else return {body: selector.substring(0, i), extension: selector.substring(i + 1)};
 };
 
+/**
+@param {Element} element
+@return {Object.<string, string>}
+*/
 w2j.cs.getAttributes = function(element) {
   var result = {};
   w2j.utils.forEach(element.attributes, function(attribute) {
@@ -23,6 +36,11 @@ w2j.cs.getAttributes = function(element) {
   return result;
 };
 
+/**
+@param {w2j.cs.ParsedSelector} parsedSelector
+@param {Element} element
+@return {*}
+*/
 w2j.cs.processElementForQuerySelector = function(parsedSelector, element) {
   if (!parsedSelector.extension) parsedSelector.extension = '*';
   switch (parsedSelector.extension) {
@@ -45,12 +63,20 @@ w2j.cs.processElementForQuerySelector = function(parsedSelector, element) {
   }
 };
 
+/**
+@param {string} selector
+@return {*}
+*/
 w2j.cs.get = function(selector) {
   var parsedSelector = w2j.cs.parseSelector(selector);
   var element = document.querySelector(parsedSelector.body);
   return w2j.cs.processElementForQuerySelector(parsedSelector, element);
 };
 
+/**
+@param {string} selector
+@return {Array.<*>}
+*/
 w2j.cs.getAll = function(selector) {
   var parsedSelector = w2j.cs.parseSelector(selector);
   var elements = document.querySelectorAll(parsedSelector.body);

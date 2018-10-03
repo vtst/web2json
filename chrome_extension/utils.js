@@ -4,20 +4,40 @@ w2j.utils = {};
 // *************************************************************************
 // Arrays
 
+/**
+@param {Array.<T>} arr
+@param {function(this: C, T, number): S} fn
+@param {?C} opt_obj
+@return {Array.<S>}
+@template C, T, S
+*/
 w2j.utils.map = function(arr, fn, opt_obj) {
   var result = [];
   for (var i = 0; i < arr.length; ++i) {
-    result.push(fn.call(opt_obj, arr[i]));
+    result.push(fn.call(opt_obj, arr[i], i));
   }
   return result;
 };
 
+/**
+@param {Array.<T>} arr
+@param {function(this: C, T, number)} fn
+@param {?C} opt_obj
+@template C, T
+*/
 w2j.utils.forEach = function(arr, fn, opt_obj) {
   for (var i = 0; i < arr.length; ++i) {
     fn.call(opt_obj, arr[i], i);
   }
 };
 
+/**
+@param {Object.<K, V>} obj
+@param {function(this: C, V, K): W}
+@param {?C} opt_obj
+@return {Object.<K, W>}
+@template C, K, V, W
+*/
 w2j.utils.mapObject = function(obj, fn, opt_obj) {
   var result = {};
   for (var key in obj) {
@@ -29,12 +49,21 @@ w2j.utils.mapObject = function(obj, fn, opt_obj) {
 // *************************************************************************
 // Promisify
 
+/**
+@param {Arguments} args
+@return {Array.<*>}
+*/
 w2j.utils.cloneArguments = function(args) {
   var result = [];
   for (var i = 0; i < args.length; ++i) result.push(args[i]);
   return result;
 }
 
+/**
+@param {function()} fn
+@param {Array.<string>} argument_names
+@return {function()}
+*/
 w2j.promisify = function(fn, argument_names) {
   return function() {
     var arguments_for_fn = w2j.utils.cloneArguments(arguments);
