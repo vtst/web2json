@@ -10,19 +10,36 @@ w2j.chrome = {tabs: {}};
 
 w2j.chrome.tabs.update = w2j.promisify(chrome.tabs.update);
 w2j.chrome.tabs.executeScript = w2j.promisify(chrome.tabs.executeScript);
+w2j.chrome.tabs.sendMessage = w2j.promisify(chrome.tabs.sendMessage);
 
 // *************************************************************************
 // Await for tab loaded
 
-w2j.bg.tabsOnUpdated = {};
+/**
+@private {Object.<string, function()>}
+*/
+w2j.bg.tabsOnUpdated_ = {};
 
+/**
+@param {number} tabId
+@param {string} status
+@return {string}
+*/
+w2j.bg.getTabStatusKey_ = function(tabId, status) {
+  return tabId + ':' + status;
+}
+
+/**
+@param {number} tabId
+@param {string} status
+@return {Promise}
+*/
 w2j.bg.tabStatusUpdated = function(tabId, status) {
-  var key = tabId + ':' + status;
-  console.log(key);
-  var callbacks = w2j.bg.tabsOnUpdated[key];
+  var key = w2j.bg.getTabStatusKey_(tabId, status);
+  var callbacks = w2j.bg.tabsOnUpdated_[key];
   if (!callbacks) {
     callbacks = [];
-    w2j.bg.tabsOnUpdated[key] = callbacks;
+    w2j.bg.tabsOnUpdated_[key] = callbacks;
   }
   return new Promise((resolve, reject) => {
     callbacks.push(resolve);
@@ -31,13 +48,12 @@ w2j.bg.tabStatusUpdated = function(tabId, status) {
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
   if (changeInfo.status) {
-    var key = tabId + ':' + changeInfo.status;
-    var callbacks = w2j.bg.tabsOnUpdated[key];
-    delete w2j.bg.tabsOnUpdated[key];
+    var key = w2j.bg.getTabStatusKey_(tabId, changeInfo.status);
+    var callbacks = w2j.bg.tabsOnUpdated_[key];
+    delete w2j.bg.tabsOnUpdated_[key];
     if (callbacks) w2j.utils.forEach(callbacks, callback => { callback(); });
   }
 });
-
 
 // *************************************************************************
 // Main functions
@@ -51,14 +67,8 @@ w2j.bg.get = async function(tab, url, obj) {
   await w2j.chrome.tabs.update(tab.id, {url: url});
   await w2j.bg.tabStatusUpdated(tab.id, 'complete');
   await w2j.bg.injectScripts(tab.id);
-  var input = {
-    my_name: 'Vincent Simonet',
-    hrefs: W2J.getAll('a/[href]')
-  }
-  chrome.tabs.sendMessage(tab.id, {objectToMap: input}, function(response) {
-    console.log(response);
-    alert('BG2: ' + JSON.stringify(response, null, 2));
-  });
+  var response = await w2j.chrome.tabs.sendMessage(tab.id, {objectToMap: obj});
+  return response;
 };
 
 // *************************************************************************
@@ -69,9 +79,13 @@ chrome.contextMenus.create({
   title: 'Extract Web to JSON'
 });
 
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
+chrome.contextMenus.onClicked.addListener(async function(info, tab) {
   if (info.menuItemId == 'extract') {
-    // w2j.bg.extract(tab);
-    w2j.bg.get(tab, 'http://www.vtst.net/').then(() => {}, error => alert(error));
+    var obj = {
+      my_name: 'Vincent Simonet',
+      hrefs: W2J.getAll('a/[href]')
+    };
+    var mappedObj = await w2j.bg.get(tab, 'http://www.vtst.net/', obj);
+    console.log(mappedObj);
   }
 });
