@@ -65,6 +65,7 @@ w2j.utils.cloneArguments = function(args) {
 @return {function()}
 */
 w2j.promisify = function(fn, argument_names) {
+  if (!fn) return null;
   return function() {
     var arguments_for_fn = w2j.utils.cloneArguments(arguments);
     return new Promise((resolve, reject) => {
@@ -88,3 +89,14 @@ w2j.promisify = function(fn, argument_names) {
     });
   }
 };
+
+// *************************************************************************
+// Promisify
+
+var chromp = {};
+if (chrome.tabs) {
+  chromp.tabs = {};
+  chromp.tabs.update = w2j.promisify(chrome.tabs.update);
+  chromp.tabs.executeScript = w2j.promisify(chrome.tabs.executeScript);
+  chromp.tabs.sendMessage = w2j.promisify(chrome.tabs.sendMessage);
+}

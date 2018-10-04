@@ -140,5 +140,4 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       mappedObject: w2j.cs.map(document, request.objectToMap)
     });
   }
-
 });
