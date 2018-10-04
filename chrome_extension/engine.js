@@ -105,7 +105,6 @@ w2j.Engine.prototype.pages = async function(params, object) {
       obj: object,
       nextPageUrl: params.nextPageSelector
     });
-    // TODO: Need a proper way to handle relative URLs
     url = (new URL(mappedObject.nextPageUrl, url)).href;
     result.push(mappedObject.obj);
     ++pageIndex;
