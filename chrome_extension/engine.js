@@ -69,6 +69,7 @@ w2j.Engine.prototype.injectScripts_ = async function() {
 };
 
 /**
+@private
 @param {*} object
 @return {Promise}
 */
@@ -96,7 +97,7 @@ w2j.Engine.prototype.get = async function(url, object) {
 @param {*} obj
 @return {*}
 */
-w2j.Engine.prototype.pages = async function(params, object) {
+w2j.Engine.prototype.getPages = async function(params, object) {
   var result = [];
   var url = params.url;
   var pageIndex = 0;
