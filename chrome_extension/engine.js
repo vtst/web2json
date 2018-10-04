@@ -1,5 +1,9 @@
+// Engine to extract content from the Web into JSON objects.
+//
+// The class w2j.Engine forms the public API of this module.
+
 var w2j == w2j || {};
-w2j.lib = {};
+w2j.engine = {};
 
 // *************************************************************************
 // Await for tab loaded
@@ -7,14 +11,14 @@ w2j.lib = {};
 /**
 @private {Object.<string, function()>}
 */
-w2j.lib.tabsOnUpdated_ = {};
+w2j.engine.tabsOnUpdated_ = {};
 
 /**
 @param {number} tabId
 @param {string} status
 @return {string}
 */
-w2j.lib.getTabStatusKey_ = function(tabId, status) {
+w2j.engine.getTabStatusKey_ = function(tabId, status) {
   return tabId + ':' + status;
 }
 
@@ -23,12 +27,12 @@ w2j.lib.getTabStatusKey_ = function(tabId, status) {
 @param {string} status
 @return {Promise}
 */
-w2j.lib.tabStatusUpdated = function(tabId, status) {
-  var key = w2j.lib.getTabStatusKey_(tabId, status);
-  var callbacks = w2j.lib.tabsOnUpdated_[key];
+w2j.engine.tabStatusUpdated = function(tabId, status) {
+  var key = w2j.engine.getTabStatusKey_(tabId, status);
+  var callbacks = w2j.engine.tabsOnUpdated_[key];
   if (!callbacks) {
     callbacks = [];
-    w2j.lib.tabsOnUpdated_[key] = callbacks;
+    w2j.engine.tabsOnUpdated_[key] = callbacks;
   }
   return new Promise((resolve, reject) => {
     callbacks.push(resolve);
@@ -37,39 +41,40 @@ w2j.lib.tabStatusUpdated = function(tabId, status) {
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
   if (changeInfo.status) {
-    var key = w2j.lib.getTabStatusKey_(tabId, changeInfo.status);
-    var callbacks = w2j.lib.tabsOnUpdated_[key];
-    delete w2j.lib.tabsOnUpdated_[key];
+    var key = w2j.engine.getTabStatusKey_(tabId, changeInfo.status);
+    var callbacks = w2j.engine.tabsOnUpdated_[key];
+    delete w2j.engine.tabsOnUpdated_[key];
     if (callbacks) w2j.utils.forEach(callbacks, callback => { callback(); });
   }
 });
 
 // *************************************************************************
-// Internal API
+// Engine class
 
 /**
-@param {Tab} tab
+@param {Tab?} opt_tab
+@constructor
 */
-w2j.lib.injectScripts = async function(tab) {
-  await chromp.tabs.executeScript(tab.id, {file: 'utils.js'});
-  await chromp.tabs.executeScript(tab.id, {file: 'content_script.js'});
+w2j.Engine = function(opt_tab) {
+  // @private {Tab}
+  this.tab_ = opt_tab;
 };
 
 /**
-@param {Tab} tab
+@private
+*/
+w2j.Engine.prototype.injectScripts_ = async function() {
+  await chromp.tabs.executeScript(this.tab_.id, {file: 'utils.js'});
+  await chromp.tabs.executeScript(this.tab_.id, {file: 'engine_cs.js'});
+};
+
+/**
 @param {string} url
 @param {*} obj
 */
-w2j.lib.get = async function(tab, url, obj) {
-  await chromp.tabs.update(tab.id, {url: url});
-  await w2j.lib.tabStatusUpdated(tab.id, 'complete');
-  await w2j.lib.injectScripts(tab.id);
-  return await chromp.tabs.sendMessage(tab.id, {objectToMap: obj});
-};
-
-// *************************************************************************
-// Public API
-
-var W2J = {
-  get: w2j.lib.get
+w2j.Engine.prototype.get = async function(url, obj) {
+  await chromp.tabs.update(this.tab_.id, {url: url});
+  await w2j.engine.tabStatusUpdated(this.tab_.id, 'complete');
+  await w2j.engine.injectScripts(this.tab_.id);
+  return await chromp.tabs.sendMessage(this.tab_.id, {objectToMap: obj});
 };
