@@ -6,7 +6,7 @@ w2j.bg = {};
 // *************************************************************************
 // Demo
 
-w2j.bg.URL = 'https://www.google.com/search?q=vincent+simonet';
+w2j.bg.URL = 'https://www.google.com/search?q=paris';
 
 w2j.bg.OBJECT1 = {
   'title': 'head title/textContent',
