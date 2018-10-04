@@ -69,12 +69,46 @@ w2j.Engine.prototype.injectScripts_ = async function() {
 };
 
 /**
+@param {*} object
+@return {Promise}
+*/
+w2j.Engine.prototype.mapObject_ = async function(object) {
+  var response = await chromp.tabs.sendMessage(this.tab_.id, {_w2j_: 'mapObject', objectToMap: object});
+  return response.mappedObject;
+};
+
+/**
 @param {string} url
 @param {*} obj
+@return {*}
 */
-w2j.Engine.prototype.get = async function(url, obj) {
+w2j.Engine.prototype.get = async function(url, object) {
   await chromp.tabs.update(this.tab_.id, {url: url});
   await w2j.engine.tabStatusUpdated(this.tab_.id, 'complete');
   await this.injectScripts_(this.tab_.id);
-  return await chromp.tabs.sendMessage(this.tab_.id, {_w2j_: 'mapObject', objectToMap: obj});
+  return await this.mapObject_(object);
+};
+
+/**
+@param {{url: string,
+         nextPageSelector: string,
+         maxPages: number}} params
+@param {*} obj
+@return {*}
+*/
+w2j.Engine.prototype.pages = async function(params, object) {
+  var result = [];
+  var url = params.url;
+  var pageIndex = 0;
+  while (url && (!params.maxPages || pageIndex < params.maxPages)) {
+    var mappedObject = await this.get(url, {
+      obj: object,
+      nextPageUrl: params.nextPageSelector
+    });
+    // TODO: Need a proper way to handle relative URLs
+    url = 'https://www.google.com' + mappedObject.nextPageUrl;
+    result.push(mappedObject.obj);
+    ++pageIndex;
+  }
+  return result;
 };

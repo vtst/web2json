@@ -28,6 +28,23 @@ w2j.bg.OBJECT2 = {
   }
 };
 
+w2j.bg.test = async function(tab) {
+  var engine = new w2j.Engine(tab);
+  var mappedObj = await engine.get(w2j.bg.URL, w2j.bg.OBJECT2);
+  console.log(mappedObj);
+};
+
+w2j.bg.test2 = async function(tab) {
+  var engine = new w2j.Engine(tab);
+  var mappedObj = await engine.pages({
+    url: w2j.bg.URL,
+    nextPageSelector: 'a#pnnext/[href]',
+    maxPages: 3
+  }, w2j.bg.OBJECT2);
+  console.log(mappedObj);
+};
+
+
 // *************************************************************************
 // Context menus
 
@@ -38,8 +55,6 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.onClicked.addListener(async function(info, tab) {
   if (info.menuItemId == 'w2j-extract') {
-    var engine = new w2j.Engine(tab);
-    var mappedObj = await engine.get(w2j.bg.URL, w2j.bg.OBJECT2);
-    console.log(mappedObj);
+    await w2j.bg.test2(tab);
   }
 });
