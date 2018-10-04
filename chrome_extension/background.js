@@ -8,13 +8,24 @@ w2j.bg = {};
 
 w2j.bg.URL = 'https://www.google.com/search?q=vincent+simonet';
 
-w2j.bg.OBJECT = {
+w2j.bg.OBJECT1 = {
   'title': 'head title/textContent',
   'hrefs': ['a/[href]'],
   'links': ['a', {
     'href': '/[href]',
     'text': '/textContent'
   }]
+};
+
+w2j.bg.OBJECT2 = {
+  results: ['div.rc h3.r a', {
+    href: '/[href]',
+    text: '/textContent'
+  }],
+  next: {
+    href: 'a.pn/[href]',
+    text: 'a.pn/textContent'
+  }
 };
 
 // *************************************************************************
@@ -28,7 +39,7 @@ chrome.contextMenus.create({
 chrome.contextMenus.onClicked.addListener(async function(info, tab) {
   if (info.menuItemId == 'w2j-extract') {
     var engine = new w2j.Engine(tab);
-    var mappedObj = await engine.get(w2j.bg.URL, w2j.bg.OBJECT);
+    var mappedObj = await engine.get(w2j.bg.URL, w2j.bg.OBJECT2);
     console.log(mappedObj);
   }
 });
