@@ -4,7 +4,7 @@
   "description": "Extract information from the web into JSON",
   "manifest_version": 2,
   "background": {
-    "scripts": ["utils.js", "api.js", "background.js"],
+    "scripts": ["utils.js", "engine.js", "background.js"],
     "persistent": false
   },
   "permissions": [

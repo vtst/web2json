@@ -4,7 +4,18 @@ var w2j = w2j || {};
 w2j.bg = {};
 
 // *************************************************************************
-// Main functions
+// Demo
+
+w2j.bg.URL = 'https://www.google.com/search?q=vincent+simonet';
+
+w2j.bg.OBJECT = {
+  'title': 'head title/textContent',
+  'hrefs': ['a/[href]'],
+  'links': ['a', {
+    'href': '/[href]',
+    'text': '/textContent'
+  }]
+};
 
 // *************************************************************************
 // Context menus
@@ -16,35 +27,8 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.onClicked.addListener(async function(info, tab) {
   if (info.menuItemId == 'w2j-extract') {
-    var obj = {
-      results: W2J.getAll('div.rc h3.r', {
-        href: W2J.get('a/[href]'),
-        text: W2J.get('a/textContent')
-      }),
-      next: W2J.get('a.pn', {
-        href: W2J.get('/[href]'),
-        text: W2J.get('/textContent')
-      })
-    }
-    var mappedObj = await w2j.bg.get(tab, 'https://www.google.com/search?q=vincent+simonet', obj);
+    var engine = new w2j.Engine(tab);
+    var mappedObj = await engine.get(w2j.bg.URL, w2j.bg.OBJECT);
     console.log(mappedObj);
   }
 });
-
-function foo() {
-  var test = async W2J.get({
-    'title': W2J.$one('head title/textContent'),
-    'hrefs': W2J.$all('a/[href]']),
-    'links': W2J.$all('a', {
-    });
-  });
-
-  var test = async W2J.get({
-    'title': 'head title/textContent',
-    'hrefs': ['a/[href]'],
-    'links': ['a', {
-      'href': '/[href]',
-      'text': '/textContent'
-    }]
-  })
-}

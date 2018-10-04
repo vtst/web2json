@@ -2,7 +2,7 @@
 //
 // The class w2j.Engine forms the public API of this module.
 
-var w2j == w2j || {};
+var w2j = w2j || {};
 w2j.engine = {};
 
 // *************************************************************************
@@ -75,6 +75,6 @@ w2j.Engine.prototype.injectScripts_ = async function() {
 w2j.Engine.prototype.get = async function(url, obj) {
   await chromp.tabs.update(this.tab_.id, {url: url});
   await w2j.engine.tabStatusUpdated(this.tab_.id, 'complete');
-  await w2j.engine.injectScripts(this.tab_.id);
-  return await chromp.tabs.sendMessage(this.tab_.id, {objectToMap: obj});
+  await this.injectScripts_(this.tab_.id);
+  return await chromp.tabs.sendMessage(this.tab_.id, {_w2j_: 'mapObject', objectToMap: obj});
 };

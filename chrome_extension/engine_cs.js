@@ -65,25 +65,25 @@ w2j.engine_cs.processElementForQuerySelector = function(parsedSelector, element)
 };
 
 /**
-@param {Node} rootNode
+@param {Node} node
 @param {string} selector
 @return {*}
 */
-w2j.engine_cs.get = function(rootNode, selector) {
+w2j.engine_cs.getOne = function(node, selector) {
   var parsedSelector = w2j.engine_cs.parseSelector(selector);
-  var element = parsedSelector.body ? rootNode.querySelector(parsedSelector.body) : rootNode;
+  var element = parsedSelector.body ? node.querySelector(parsedSelector.body) : node;
   if (element) return w2j.engine_cs.processElementForQuerySelector(parsedSelector, element);
   else return null;
 };
 
 /**
-@param {Node} rootNode
+@param {Node} node
 @param {string} selector
 @return {Array.<*>}
 */
-w2j.engine_cs.getAll = function(rootNode, selector) {
+w2j.engine_cs.getAll = function(node, selector) {
   var parsedSelector = w2j.engine_cs.parseSelector(selector);
-  var elements = parsedSelector.body ? rootNode.querySelectorAll(parsedSelector.body) : [rootNode];
+  var elements = parsedSelector.body ? node.querySelectorAll(parsedSelector.body) : [node];
   return w2j.utils.map(
     elements,
     w2j.engine_cs.processElementForQuerySelector.bind(null, parsedSelector));
@@ -92,52 +92,44 @@ w2j.engine_cs.getAll = function(rootNode, selector) {
 // *************************************************************************
 // Extractor
 
-w2j.engine_cs.mapObject = function(obj, fn, opt_context) {
-  if (typeof obj === 'object') {
-    if (obj instanceof Array) {
-      return w2j.utils.map(obj, elt => { return w2j.engine_cs.mapObject(elt, fn, opt_context); });
-    } else if (obj._w2j_) {
-      return fn.call(opt_context, obj);
+w2j.engine_cs.getType = function(object) {
+  var t = typeof object;
+  if (t == 'object' && object instanceof Array) return 'array';
+  else return t;
+}
+
+w2j.engine_cs.mapObject = function(node, object) {
+  if (!node) return;
+  switch (w2j.engine_cs.getType(object)) {
+  case 'object':
+    var gotNode = object._on_ ? w2j.utils.getOne(node, object._on_) : node;
+    return w2j.utils.mapObject(object, (value, key) => {
+      if (key == '_on_') return undefined;
+      else return w2j.engine_cs.mapObject(node, value);
+    });
+  case 'array':
+    if (object.length == 0 || object.length > 2) throw 'Unexpected array length';
+    var gotNodes = w2j.engine_cs.getAll(node, object[0]);
+    if (object.length == 2) {
+      return w2j.utils.map(gotNodes, gotNode => { return w2j.engine_cs.mapObject(gotNode, object[1]); });
     } else {
-      return w2j.utils.mapObject(obj, elt => { return w2j.engine_cs.mapObject(elt, fn, opt_context); });
+      return gotNodes;
     }
-  } else {
-    return obj;
+  case 'string':
+    return w2j.engine_cs.getOne(node, object);
+  default:
+    return object;
   }
 };
 
-w2j.engine_cs.map = function(rootNode, rootObject) {
-  return w2j.engine_cs.mapObject(rootObject, function(object) {
-    switch (object._w2j_) {
-    case 'get':
-      var got = w2j.engine_cs.get(rootNode, object.selector);
-      if (got && object.cont) {
-        return w2j.engine_cs.map(got, object.cont);
-      } else {
-        return got;
-      }
-    case 'getAll':
-      var gots = w2j.engine_cs.getAll(rootNode, object.selector);
-      if (object.cont) {
-        return w2j.utils.map(gots, function(got) {
-          return w2j.engine_cs.map(got, object.cont);
-        });
-      } else {
-        return gots;
-      }
-    default:
-      return object;
-    }
-  });
-};
-
 // *************************************************************************
-// Messaging with the background page
+// Content script API
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.objectToMap) {
+  // TODO: Check sender
+  if (request._w2j_ == 'mapObject') {
     sendResponse({
-      mappedObject: w2j.engine_cs.map(document, request.objectToMap)
+      mappedObject: w2j.engine_cs.mapObject(document, request.objectToMap)
     });
   }
 });
