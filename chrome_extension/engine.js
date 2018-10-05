@@ -102,7 +102,6 @@ w2j.Engine.prototype.getPages = async function(params, object) {
   var url = params.url;
   var pageIndex = 0;
   while (url && (!params.maxPages || pageIndex < params.maxPages)) {
-    console.log(url);
     var mappedObject = await this.get(url, {
       obj: object,
       nextPageUrl: params.nextPageSelector
