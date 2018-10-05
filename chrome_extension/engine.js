@@ -70,37 +70,37 @@ w2j.Engine.prototype.injectScripts_ = async function() {
 
 /**
 @private
-@param {*} object
+@param {*} pattern
 @return {Promise}
 */
-w2j.Engine.prototype.mapObject_ = async function(object) {
-  var response = await chromp.tabs.sendMessage(this.tab_.id, {_w2j_: 'mapObject', objectToMap: object});
-  return response.mappedObject;
+w2j.Engine.prototype.getFromPattern_ = async function(pattern) {
+  var response = await chromp.tabs.sendMessage(this.tab_.id, {_w2j_: 'getFromPattern', pattern: pattern});
+  return response.result;
 };
 
 /**
 @param {string} url
-@param {*} object
+@param {*} pattern
 @return {*}
 @private
 */
-w2j.Engine.prototype.getOne_ = async function(url, object) {
+w2j.Engine.prototype.getOne_ = async function(url, pattern) {
   await chromp.tabs.update(this.tab_.id, {url: url});
   await w2j.engine.tabStatusUpdated(this.tab_.id, 'complete');
   await this.injectScripts_(this.tab_.id);
-  return await this.mapObject_(object);
+  return await this.getFromPattern_(pattern);
 };
 
 /**
 @param {Array.<string>} urls
-@param {*} object
+@param {*} pattern
 @return {Array.<*>}
 @private
 */
-w2j.Engine.prototype.getMultiple_ = async function(urls, object) {
+w2j.Engine.prototype.getMultiple_ = async function(urls, pattern) {
   var result = [];
   for (var i = 0; i < urls.length; ++i) {
-    var item = await this.getOne_(urls[i], object);
+    var item = await this.getOne_(urls[i], pattern);
     result.push(item);
   }
   return result;
@@ -111,9 +111,9 @@ w2j.Engine.prototype.getMultiple_ = async function(urls, object) {
 @param {*} obj
 @return {*}
 */
-w2j.Engine.prototype.get = function(urlOrUrls, object) {
-  if (urlOrUrls instanceof Array) return this.getMultiple_(urlOrUrls, object);
-  else return this.getOne_(urlOrUrls, object);
+w2j.Engine.prototype.get = function(urlOrUrls, pattern) {
+  if (urlOrUrls instanceof Array) return this.getMultiple_(urlOrUrls, pattern);
+  else return this.getOne_(urlOrUrls, pattern);
 };
 
 /**
@@ -123,18 +123,18 @@ w2j.Engine.prototype.get = function(urlOrUrls, object) {
 @param {*} obj
 @return {*}
 */
-w2j.Engine.prototype.getPages = async function(params, object) {
-  var result = [];
+w2j.Engine.prototype.getPagined = async function(params, pattern) {
+  var results = [];
   var url = params.url;
   var pageIndex = 0;
   while (url && (!params.maxPages || pageIndex < params.maxPages)) {
-    var mappedObject = await this.get(url, {
-      obj: object,
+    var result = await this.get(url, {
+      pattern: pattern,
       nextPageUrl: params.nextPageSelector
     });
-    url = w2j.utils.relativeUrl(mappedObject.nextPageUrl, url);
-    result.push(mappedObject.obj);
+    url = w2j.utils.relativeUrl(result.nextPageUrl, url);
+    results.push(result.pattern);
     ++pageIndex;
   }
-  return result;
+  return results;
 };

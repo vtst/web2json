@@ -92,33 +92,37 @@ w2j.engine_cs.getAll = function(node, selector) {
 // *************************************************************************
 // Extractor
 
+/**
+@param {*} object
+@return {string}
+*/
 w2j.engine_cs.getType = function(object) {
   var t = typeof object;
   if (t == 'object' && object instanceof Array) return 'array';
   else return t;
-}
+};
 
-w2j.engine_cs.mapObject = function(node, object) {
+w2j.engine_cs.getFromPattern = function(node, pattern) {
   if (!node) return;
-  switch (w2j.engine_cs.getType(object)) {
+  switch (w2j.engine_cs.getType(pattern)) {
   case 'object':
-    var gotNode = object._on_ ? w2j.utils.getOne(node, object._on_) : node;
-    return w2j.utils.mapObject(object, (value, key) => {
+    var gotNode = pattern._on_ ? w2j.utils.getOne(node, pattern._on_) : node;
+    return w2j.utils.mapObject(pattern, (value, key) => {
       if (key == '_on_') return undefined;
-      else return w2j.engine_cs.mapObject(node, value);
+      else return w2j.engine_cs.getFromPattern(node, value);
     });
   case 'array':
-    if (object.length == 0 || object.length > 2) throw 'Unexpected array length';
-    var gotNodes = w2j.engine_cs.getAll(node, object[0]);
-    if (object.length == 2) {
-      return w2j.utils.map(gotNodes, gotNode => { return w2j.engine_cs.mapObject(gotNode, object[1]); });
+    if (pattern.length == 0 || pattern.length > 2) throw 'Unexpected array length';
+    var gotNodes = w2j.engine_cs.getAll(node, pattern[0]);
+    if (pattern.length == 2) {
+      return w2j.utils.map(gotNodes, gotNode => { return w2j.engine_cs.getFromPattern(gotNode, pattern[1]); });
     } else {
       return gotNodes;
     }
   case 'string':
-    return w2j.engine_cs.getOne(node, object);
+    return w2j.engine_cs.getOne(node, pattern);
   default:
-    return object;
+    return pattern;
   }
 };
 
@@ -127,9 +131,9 @@ w2j.engine_cs.mapObject = function(node, object) {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   // TODO: Check sender
-  if (request._w2j_ == 'mapObject') {
+  if (request._w2j_ == 'getFromPattern') {
     sendResponse({
-      mappedObject: w2j.engine_cs.mapObject(document, request.objectToMap)
+      result: w2j.engine_cs.getFromPattern(document, request.pattern)
     });
   }
 });

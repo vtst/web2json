@@ -37,7 +37,7 @@ w2j.bg.test = async function(tab) {
 
 w2j.bg.test2 = async function(tab) {
   var engine = new w2j.Engine(tab);
-  var mappedObj = await engine.getPages({
+  var mappedObj = await engine.getPagined({
     url: w2j.bg.URL,
     nextPageSelector: 'a#pnnext/[href]',
     maxPages: 3
