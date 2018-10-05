@@ -102,6 +102,11 @@ w2j.engine_cs.getType = function(object) {
   else return t;
 };
 
+/**
+@param {Element} node
+@param {*} pattern
+@return {*}
+*/
 w2j.engine_cs.getFromPattern = function(node, pattern) {
   if (!node) return;
   switch (w2j.engine_cs.getType(pattern)) {
