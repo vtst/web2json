@@ -44,7 +44,16 @@ w2j.utils.mapObject = function(obj, fn, opt_obj) {
     result[key] = fn.call(opt_obj, obj[key], key);
   }
   return result;
-}
+};
+
+/**
+@param {string} url
+@param {string} base
+@return {string}
+*/
+w2j.utils.relativeUrl = function(url, base) {
+  return url && (new URL(url, base)).href;
+};
 
 // *************************************************************************
 // Promisify

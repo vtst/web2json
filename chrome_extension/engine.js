@@ -80,14 +80,40 @@ w2j.Engine.prototype.mapObject_ = async function(object) {
 
 /**
 @param {string} url
-@param {*} obj
+@param {*} object
 @return {*}
+@private
 */
-w2j.Engine.prototype.get = async function(url, object) {
+w2j.Engine.prototype.getOne_ = async function(url, object) {
   await chromp.tabs.update(this.tab_.id, {url: url});
   await w2j.engine.tabStatusUpdated(this.tab_.id, 'complete');
   await this.injectScripts_(this.tab_.id);
   return await this.mapObject_(object);
+};
+
+/**
+@param {Array.<string>} urls
+@param {*} object
+@return {Array.<*>}
+@private
+*/
+w2j.Engine.prototype.getMultiple_ = async function(urls, object) {
+  var result = [];
+  for (var i = 0; i < urls.length; ++i) {
+    var item = await this.getOne_(urls[i], object);
+    result.push(item);
+  }
+  return result;
+};
+
+/**
+@param {string|Array.<string>} urlOrUrls
+@param {*} obj
+@return {*}
+*/
+w2j.Engine.prototype.get = function(urlOrUrls, object) {
+  if (urlOrUrls instanceof Array) return this.getMultiple_(urlOrUrls, object);
+  else return this.getOne_(urlOrUrls, object);
 };
 
 /**
@@ -106,7 +132,7 @@ w2j.Engine.prototype.getPages = async function(params, object) {
       obj: object,
       nextPageUrl: params.nextPageSelector
     });
-    url = mappedObject.nextPageUrl && (new URL(mappedObject.nextPageUrl, url)).href;
+    url = w2j.utils.relativeUrl(mappedObject.nextPageUrl, url);
     result.push(mappedObject.obj);
     ++pageIndex;
   }

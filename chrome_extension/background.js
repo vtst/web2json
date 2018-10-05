@@ -43,6 +43,13 @@ w2j.bg.test2 = async function(tab) {
     maxPages: 3
   }, w2j.bg.OBJECT2);
   console.log(mappedObj);
+  var list = await engine.get(w2j.utils.map(mappedObj[0].results, function(result) {
+    return w2j.utils.relativeUrl(result.href, w2j.bg.URL);
+  }), {
+    title: 'title/textContent',
+    div: 'div/textContent'
+  });
+  console.log(list);
 };
 
 
