@@ -1,6 +1,7 @@
 # Engine:
 * Create and dispose the tab
 * Multiple tabs in parallel
+* Throttling
 * Evaluate script entered by the user in a separate file (aka proper top level API)
 * De-duping
 * Crawling
