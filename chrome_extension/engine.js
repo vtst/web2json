@@ -58,6 +58,23 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
 w2j.Engine = function(opt_tab) {
   // @private {Tab}
   this.tab_ = opt_tab;
+  // @private {boolean}
+  this.disposeTab_ = false;
+};
+
+/**
+@private
+*/
+w2j.Engine.prototype.createTab_ = async function() {
+  var tab = await chromp.tabs.create({});
+  this.tab_ = tab;
+  this.disposeTab_ = true;
+};
+
+w2j.Engine.prototype.dispose = async function() {
+  if (this.disposeTab_) await chromp.tabs.remove(this.tab_.id);
+  this.tab_ = null;
+  this.disposeTab_ = false;
 };
 
 /**
@@ -85,6 +102,7 @@ w2j.Engine.prototype.getFromPattern_ = async function(pattern) {
 @private
 */
 w2j.Engine.prototype.getOne_ = async function(url, pattern) {
+  if (!this.tab_) await this.createTab_();
   await chromp.tabs.update(this.tab_.id, {url: url});
   await w2j.engine.tabStatusUpdated(this.tab_.id, 'complete');
   await this.injectScripts_(this.tab_.id);

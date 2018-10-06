@@ -1,5 +1,5 @@
 # Engine:
-* Create and dispose the tab
+* (?) Can we use the background page instead of creating a tab?
 * Multiple tabs in parallel
 * Throttling
 * Evaluate script entered by the user in a separate file (aka proper top level API)

@@ -36,7 +36,7 @@ w2j.bg.test = async function(tab) {
 };
 
 w2j.bg.test2 = async function(tab) {
-  var engine = new w2j.Engine(tab);
+  var engine = new w2j.Engine();
   var mappedObj = await engine.getPagined({
     url: w2j.bg.URL,
     nextPageSelector: 'a#pnnext/[href]',
@@ -50,6 +50,7 @@ w2j.bg.test2 = async function(tab) {
     div: 'div/textContent'
   });
   console.log(list);
+  await engine.dispose();
 };
 
 

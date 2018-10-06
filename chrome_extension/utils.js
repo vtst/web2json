@@ -105,7 +105,9 @@ w2j.promisify = function(fn, argument_names) {
 var chromp = {};
 if (chrome.tabs) {
   chromp.tabs = {};
-  chromp.tabs.update = w2j.promisify(chrome.tabs.update);
+  chromp.tabs.create = w2j.promisify(chrome.tabs.create);
   chromp.tabs.executeScript = w2j.promisify(chrome.tabs.executeScript);
+  chromp.tabs.remove = w2j.promisify(chrome.tabs.remove);
   chromp.tabs.sendMessage = w2j.promisify(chrome.tabs.sendMessage);
+  chromp.tabs.update = w2j.promisify(chrome.tabs.update);
 }
