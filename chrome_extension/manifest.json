@@ -4,9 +4,10 @@
   "description": "Extract information from the web into JSON",
   "manifest_version": 2,
   "background": {
-    "scripts": ["utils.js", "engine.js", "background.js"],
+    "scripts": ["utils.js", "engine.js", "localeval.js", "background.js"],
     "persistent": false
   },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "permissions": [
     "http://*/",
     "https://*/",

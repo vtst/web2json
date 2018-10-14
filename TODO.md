@@ -1,8 +1,8 @@
 # Engine:
 * (?) Can we use the background page instead of creating a tab?
+* Actions
 * Multiple tabs in parallel
 * Throttling
-* Evaluate script entered by the user in a separate file (aka proper top level API)
 * De-duping
 * Crawling
 
