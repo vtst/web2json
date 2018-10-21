@@ -77,6 +77,10 @@ w2j.Engine.prototype.dispose = async function() {
   this.disposeTab_ = false;
 };
 
+w2j.Engine.prototype.sendMessage = async function(message) {
+  return await chromp.tabs.sendMessage(this.tab_.id, message);
+};
+
 /**
 @private
 */
@@ -91,7 +95,7 @@ w2j.Engine.prototype.injectScripts_ = async function() {
 @return {Promise}
 */
 w2j.Engine.prototype.getFromPattern_ = async function(pattern) {
-  var response = await chromp.tabs.sendMessage(this.tab_.id, {_w2j_: 'getFromPattern', pattern: pattern});
+  var response = await this.sendMessage({_w2j_: 'getFromPattern', pattern: pattern});
   return response.result;
 };
 
@@ -155,4 +159,11 @@ w2j.Engine.prototype.getPagined = async function(params, pattern) {
     ++pageIndex;
   }
   return results;
+};
+
+/**
+@param {Array.<w2j.engine_cs.Action>} actions
+*/
+w2j.Engine.prototype.doActions = async function(actions) {
+  await this.sendMessage({_w2j_: 'doActions', actions: actions});
 };

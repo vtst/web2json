@@ -41,7 +41,7 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.onClicked.addListener(async function(info, tab) {
   if (info.menuItemId == 'w2j-extract') {
-    var script = await w2j.bg.getScriptFromPackage('examples/local.js');
+    var script = await w2j.bg.getScriptFromPackage('examples/actions.js');
     await w2j.bg.executeScript(script);
   }
 });

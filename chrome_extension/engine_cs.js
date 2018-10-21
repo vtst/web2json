@@ -90,7 +90,7 @@ w2j.engine_cs.getAll = function(node, selector) {
 };
 
 // *************************************************************************
-// Extractor
+// getFromPattern
 
 /**
 @param {*} object
@@ -132,13 +132,46 @@ w2j.engine_cs.getFromPattern = function(node, pattern) {
 };
 
 // *************************************************************************
+// doActions
+
+/**
+@param {Element} node
+@param {w2j.engine_cs.Action} action
+*/
+w2j.engine_cs.doAction = function(node, action) {
+  switch (action.type) {
+    case 'set':
+      var elements = node.querySelectorAll(action.selector);
+      w2j.utils.forEach(elements, function(element) {
+        element.value = action.value;
+      });
+      break;
+  }
+};
+
+/**
+@param {Element} node
+@param {Array.<w2j.engine_cs.Action>} actions
+*/
+w2j.engine_cs.doActions = function(node, actions) {
+  w2j.utils.forEach(actions, w2j.engine_cs.doAction.bind(null, node));
+};
+
+// *************************************************************************
 // Content script API
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   // TODO: Check sender
-  if (request._w2j_ == 'getFromPattern') {
-    sendResponse({
-      result: w2j.engine_cs.getFromPattern(document, request.pattern)
-    });
+  switch (request._w2j_) {
+    case 'getFromPattern':
+      sendResponse({
+        result: w2j.engine_cs.getFromPattern(document, request.pattern)
+      });
+      break;
+    case 'doActions':
+      w2j.engine_cs.doActions(document, request.actions);
+      sendResponse({});
+      break;
+    default:
   }
 });
