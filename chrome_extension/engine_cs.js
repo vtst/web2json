@@ -139,11 +139,19 @@ w2j.engine_cs.getFromPattern = function(node, pattern) {
 @param {w2j.engine_cs.Action} action
 */
 w2j.engine_cs.doAction = function(node, action) {
-  switch (action.type) {
+  switch (action.action) {
     case 'set':
       var elements = node.querySelectorAll(action.selector);
       w2j.utils.forEach(elements, function(element) {
         element.value = action.value;
+      });
+      break;
+    case 'event':
+      var elements = node.querySelectorAll(action.selector);
+      w2j.utils.forEach(elements, function(element) {
+        var event = document.createEvent('Events');
+        event.initEvent(action.type, true, false);
+        element.dispatchEvent(event);
       });
       break;
   }
