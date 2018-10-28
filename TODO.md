@@ -1,6 +1,5 @@
 # Engine:
 * (?) Can we use the background page instead of creating a tab?
-* Actions
 * Multiple tabs in parallel
 * Throttling
 * De-duping

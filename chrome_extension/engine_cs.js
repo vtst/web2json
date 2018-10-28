@@ -134,6 +134,17 @@ w2j.engine_cs.getFromPattern = function(node, pattern) {
 // *************************************************************************
 // doActions
 
+w2j.engine_cs.EVENT_CONSTRUCTORS_ = {
+  'click': MouseEvent,
+  'dblclick': MouseEvent,
+  'mouseup': MouseEvent,
+  'mousedown': MouseEvent,
+  'keydown': KeyboardEvent,
+  'keypress': KeyboardEvent,
+  'keyup': KeyboardEvent,
+  'wheel': WheelEvent
+};
+
 /**
 @param {Element} node
 @param {w2j.engine_cs.Action} action
@@ -147,12 +158,14 @@ w2j.engine_cs.doAction = function(node, action) {
       });
       break;
     case 'event':
-      var elements = node.querySelectorAll(action.selector);
-      w2j.utils.forEach(elements, function(element) {
-        var event = document.createEvent('Events');
-        event.initEvent(action.type, true, false);
-        element.dispatchEvent(event);
-      });
+      var eventConstructor = w2j.engine_cs.EVENT_CONSTRUCTORS_[action.type];
+      if (eventConstructor) {
+        var elements = node.querySelectorAll(action.selector);
+        w2j.utils.forEach(elements, function(element) {
+          var event = new eventConstructor(action.type, action.init);
+          element.dispatchEvent(event);
+        });
+      }
       break;
   }
 };
