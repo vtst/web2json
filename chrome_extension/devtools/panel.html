@@ -12,6 +12,9 @@
     <script type="text/javascript" src="panel.js"></script>
 
     <h1>My panel</h1>
-    <div id="message" style="white-space: pre; font-family: monospace;"></div>
+    <ul>
+      <li ng-repeat="ancestor in ancestors">
+        {{ancestor}}
+      </li>
   </body>
 </html>
