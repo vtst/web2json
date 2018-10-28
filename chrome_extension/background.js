@@ -7,17 +7,6 @@ w2j.bg = {};
 // Executing scripts
 
 /**
-@param {string} path
-@return {string}
-*/
-w2j.bg.getScriptFromPackage = async function(path) {
-  const url = chrome.runtime.getURL(path);
-  var response = await fetch(url);
-  var script = await response.text();
-  return script;
-};
-
-/**
 @param {string} script
 */
 w2j.bg.executeScript = async function(script) {
@@ -41,7 +30,7 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.onClicked.addListener(async function(info, tab) {
   if (info.menuItemId == 'w2j-extract') {
-    var script = await w2j.bg.getScriptFromPackage('examples/actions.js');
+    var script = await w2j.utils.getFileContentFromPackage('examples/actions.js');
     await w2j.bg.executeScript(script);
   }
 });

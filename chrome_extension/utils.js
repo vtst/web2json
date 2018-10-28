@@ -55,6 +55,26 @@ w2j.utils.relativeUrl = function(url, base) {
   return url && (new URL(url, base)).href;
 };
 
+/**
+@param {string} path
+@return {string}
+*/
+w2j.utils.getFileContentFromPackage = async function(path) {
+  const url = chrome.runtime.getURL(path);
+  var response = await fetch(url);
+  return await response.text();
+};
+
+/**
+@param {string} path
+@return {{result: *, isException: *}}
+*/
+w2j.utils.evalScriptInInspectedWindow = async function(path) {
+  var script = await w2j.utils.getFileContentFromPackage(path);
+  script = '(function() {' + script + '})();';
+  return await chromp.devtools.inspectedWindow.eval(script);
+};
+
 // *************************************************************************
 // Promises
 
