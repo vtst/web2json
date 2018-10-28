@@ -1,6 +1,10 @@
-.w2j-selector-tag {
+.w2j-selector-item {
   background-color: #ddd;
   display: inline-block;
   padding: 2px 4px;
   border-radius: 100px;
+}
+
+.w2j-selector-tag {
+  font-weight: bold;
 }
