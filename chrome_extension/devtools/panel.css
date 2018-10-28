@@ -1,8 +1,14 @@
 .w2j-selector-item {
   background-color: #ddd;
+  border: solid 1px #ddd;
+  border-radius: 100px;
   display: inline-block;
   padding: 2px 4px;
-  border-radius: 100px;
+  cursor: pointer;
+}
+
+.w2j-selector-item:hover {
+  color: rgb(63,81,181);
 }
 
 .w2j-selector-tag {
