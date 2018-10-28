@@ -7,6 +7,7 @@ w2j.panel_cs = {};
 */
 w2j.panel_cs.inspectElement = function(element) {
   var s = element.tagName;
+  if (element.id) s += '#' + element.id;
   if (element.classList) {
     for (var i = 0; i < element.classList.length; ++i) {
       s += '.' + element.classList.item(i);
