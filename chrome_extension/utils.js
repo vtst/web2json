@@ -56,13 +56,22 @@ w2j.utils.relativeUrl = function(url, base) {
 };
 
 /**
+@private {Object.<string, string>}
+*/
+w2j.utils.PACKAGE_FILES_CACHE_ = [];
+
+/**
 @param {string} path
 @return {string}
 */
 w2j.utils.getFileContentFromPackage = async function(path) {
+  var cached = w2j.utils.PACKAGE_FILES_CACHE_[path];
+  if (cached) return cached;
   const url = chrome.runtime.getURL(path);
   var response = await fetch(url);
-  return await response.text();
+  var text = await response.text();
+  w2j.utils.PACKAGE_FILES_CACHE_[path] = text;
+  return text;
 };
 
 /**

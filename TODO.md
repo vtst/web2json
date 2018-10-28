@@ -1,3 +1,6 @@
+# Code health:
+* [Bug] Are we injecting engine_cs.js several times?
+
 # Engine:
 * (?) Can we use the background page instead of creating a tab?
 * Multiple tabs in parallel
