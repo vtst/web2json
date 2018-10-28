@@ -6,7 +6,7 @@ w2j.panel_cs = {};
 @return {string}
 */
 w2j.panel_cs.inspectElement = function(element) {
-  var s = element.tagName;
+  var s = element.tagName.toLowerCase();
   if (element.id) s += '#' + element.id;
   if (element.classList) {
     for (var i = 0; i < element.classList.length; ++i) {
@@ -19,7 +19,7 @@ w2j.panel_cs.inspectElement = function(element) {
 w2j.panel_cs.inspectAncestors = function(element) {
   var current = element;
   var result = [];
-  while (current) {
+  while (current instanceof Element) {
     result.push(w2j.panel_cs.inspectElement(current));
     current = current.parentNode;
   }
