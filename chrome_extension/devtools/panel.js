@@ -16,12 +16,14 @@ w2j.panel.formatElementInfo = function(elementInfo) {
 
 w2j.panel.init = async function() {
   await w2j.utils.onContentLoaded();
-  document.getElementById('message').textContent = 'Hello!';
-  chrome.devtools.panels.elements.onSelectionChanged.addListener(async function(event) {
+  var messageDiv = document.getElementById('message');
+  async function updateElementInfo() {
     var response = await w2j.utils.evalScriptInInspectedWindow('devtools/panel_cs.js');
-    document.getElementById('message').textContent = 
+    messageDiv.textContent = 
       w2j.utils.map(response.result, w2j.panel.formatElementInfo).join('\n');
-  });
+  }
+  updateElementInfo();
+  chrome.devtools.panels.elements.onSelectionChanged.addListener(updateElementInfo);
 };
 
 w2j.panel.init();
