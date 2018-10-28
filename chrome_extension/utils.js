@@ -56,6 +56,21 @@ w2j.utils.relativeUrl = function(url, base) {
 };
 
 // *************************************************************************
+// Promises
+
+w2j.utils.onContentLoaded = function(opt_document) {
+  var doc = opt_document || document;
+  return new Promise((resolve, reject) => {
+    var object = {};
+    object.handler = function(event) {
+      doc.removeEventListener('DOMContentLoaded', object.handler);
+      resolve(event);
+    }
+    doc.addEventListener('DOMContentLoaded', object.handler);
+  });
+};
+
+// *************************************************************************
 // Promisify
 
 /**
@@ -70,10 +85,10 @@ w2j.utils.cloneArguments = function(args) {
 
 /**
 @param {function()} fn
-@param {Array.<string>} argument_names
+@param {Array.<string>} callbackArgumentNames
 @return {function()}
 */
-w2j.promisify = function(fn, argument_names) {
+w2j.promisify = function(fn, callbackArgumentNames) {
   if (!fn) return null;
   return function() {
     var arguments_for_fn = w2j.utils.cloneArguments(arguments);
@@ -82,10 +97,10 @@ w2j.promisify = function(fn, argument_names) {
         if (chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
         } else {
-          if (argument_names) {
+          if (callbackArgumentNames) {
             var arg = {};
-            w2j.utils.forEach(argument_names, (argument_name, i) => {
-              arg[argument_name] = arguments[i];
+            w2j.utils.forEach(callbackArgumentNames, (argumentName, i) => {
+              arg[argumentName] = arguments[i];
             });
             resolve(arg);
           } else {
@@ -110,4 +125,13 @@ if (chrome.tabs) {
   chromp.tabs.remove = w2j.promisify(chrome.tabs.remove);
   chromp.tabs.sendMessage = w2j.promisify(chrome.tabs.sendMessage);
   chromp.tabs.update = w2j.promisify(chrome.tabs.update);
+}
+
+if (chrome.devtools) {
+  chromp.devtools = {};
+  if (chrome.devtools.inspectedWindow) {
+    chromp.devtools.inspectedWindow = {};
+    chromp.devtools.inspectedWindow.eval = w2j.promisify(
+      chrome.devtools.inspectedWindow.eval, ['result', 'isException']);
+  }
 }
