@@ -1,20 +1,33 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
+    <link rel="stylesheet" href="panel.css">
   </head>
   <body ng-app="PanelApp" ng-controller="PanelCtrl" ng-cloak>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+	  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
     <script type="text/javascript" src="../utils.js"></script>
     <script type="text/javascript" src="panel.js"></script>
 
-    <h1>My panel</h1>
-    <ul>
-      <li ng-repeat="ancestor in ancestors">
-        {{ancestor}}
-      </li>
+    <md-toolbar class="md-theme-light">
+      <h2 class="md-toolbar-tools">
+        <span>Selector Builder</span>
+      </h2>
+    </md-toolbar>
+    <md-content>
+      <md-list>
+        <md-list-item ng-repeat="ancestor in ancestors">
+          <div class="md-list-item-text w2j-ancestor">
+            <span class="w2j-selector-tag">{{ancestor.tagName}}</span>
+            <span class="w2j-selector-tag" ng-if="ancestor.id">#{{ancestor.id}}</span>
+            <span class="w2j-selector-tag" ng-repeat="className in ancestor.classNames">.{{className}}</span>
+          </div>
+          <md-divider ng-if="!$last"></md-divider>
+        </md-list-item>
+      </md-list>
+    </md-content>
   </body>
 </html>

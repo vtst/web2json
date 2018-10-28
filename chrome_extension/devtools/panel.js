@@ -17,9 +17,9 @@ w2j.panel.formatElementInfo = function(elementInfo) {
 w2j.panel.init = async function($scope) {
   var messageDiv = document.getElementById('message');
   async function updateElementInfo() {
-    console.log('update');
     var response = await w2j.utils.evalScriptInInspectedWindow('devtools/panel_cs.js');
-    $scope.ancestors = w2j.utils.map(response.result, w2j.panel.formatElementInfo);
+    console.log(response.result);
+    $scope.ancestors = response.result;
     $scope.$apply();
   }
   updateElementInfo();
