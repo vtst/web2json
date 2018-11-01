@@ -2,6 +2,11 @@
   white-space: pre;
 }
 
+.w2j-ancestor {
+  min-height: initial;
+  height: 30px;
+}
+
 .w2j-selector-item {
   background-color: #ddd;
   border: solid 1px #ddd;

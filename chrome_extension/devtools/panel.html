@@ -20,8 +20,8 @@
     <md-content>
       <div class="w2j-selector">{{formatSelection(selectableAncestorInfos)}}</div>
       <md-list>
-        <md-list-item ng-repeat="selectableAncestorInfo in selectableAncestorInfos">
-          <div class="md-list-item-text w2j-ancestor">
+        <md-list-item class="w2j-ancestor" ng-repeat="selectableAncestorInfo in selectableAncestorInfos">
+          <div class="md-list-item-text">
             <w2j-selector-item selected="selectableAncestorInfo.tagName.selected" tag="true">{{selectableAncestorInfo.tagName.value}}</w2j-selector-item>
             <w2j-selector-item selected="selectableAncestorInfo.id.selected" ng-if="selectableAncestorInfo.id.value">#{{selectableAncestorInfo.id.value}}</w2j-selector-item>
             <w2j-selector-item selected="className.selected" ng-repeat="className in selectableAncestorInfo.classNames">.{{className.value}}</w2j-selector-item>
