@@ -1,3 +1,7 @@
+.w2j-selector {
+  white-space: pre;
+}
+
 .w2j-selector-item {
   background-color: #ddd;
   border: solid 1px #ddd;

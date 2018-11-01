@@ -10,7 +10,7 @@ w2j.panel.getSelectableElementInfo = function(elementInfo) {
   }
   return {
     tagName: getSelectable(elementInfo.tagName),
-    id: getSelectable(elementInfo).id,
+    id: getSelectable(elementInfo.id),
     classNames: w2j.utils.map(elementInfo.classNames, getSelectable)
   };
 };
@@ -48,4 +48,20 @@ module.component('w2jSelectorItem', {
 
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
+  function formatSelectableAncestorInfo(selectableAncestorInfo) {
+    var s = '';
+    console.log(selectableAncestorInfo);
+    if (selectableAncestorInfo.tagName.selected) s += selectableAncestorInfo.tagName.value;
+    if (selectableAncestorInfo.id.selected) s += '#' + selectableAncestorInfo.id.value;
+    w2j.utils.forEach(selectableAncestorInfo.classNames, function(className) {
+      if (className.selected) s += '.' + className.value;
+    });
+    if (s) s += '\n';
+    return s;
+  }
+  $scope.formatSelection = function(selectableAncestorInfos) {
+    var strings = w2j.utils.map(selectableAncestorInfos || [], formatSelectableAncestorInfo);
+    strings.reverse();
+    return strings.join('');
+  }
 });
