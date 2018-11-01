@@ -31,7 +31,20 @@ w2j.panel.init = async function($scope) {
 
 var module = angular.module('PanelApp', ['ngMaterial', 'ngMessages']);
 
+module.component('w2jSelectorItem', {
+  templateUrl: 'selector_item.html',
+  bindings: {
+    tag: '@',
+    selected: '='
+  },
+  transclude: true,
+  controller: function() {
+    this.onClick = function() {
+      this.selected = !this.selected;
+    };
+  }
+});
+
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
 });
-

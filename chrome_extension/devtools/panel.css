@@ -8,9 +8,13 @@
 }
 
 .w2j-selector-item:hover {
-  color: rgb(63,81,181);
 }
 
 .w2j-selector-tag {
   font-weight: bold;
+}
+
+.w2j-selector-item-selected {
+  background-color: rgb(63,81,181);
+  color: white;
 }
