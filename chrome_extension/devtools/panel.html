@@ -19,11 +19,11 @@
     </md-toolbar>
     <md-content>
       <md-list>
-        <md-list-item ng-repeat="ancestor in ancestors">
+        <md-list-item ng-repeat="selectableAncestorInfo in selectableAncestorInfos">
           <div class="md-list-item-text w2j-ancestor">
-            <w2j-selector-item selected="ancestor.selected" tag="true">{{ancestor.tagName}}</w2j-selector-item>
-            <w2j-selector-item selected="ancestor.selected" ng-if="ancestor.id">#{{ancestor.id}}</w2j-selector-item>
-            <w2j-selector-item selected="ancestor.selected" ng-repeat="className in ancestor.classNames">.{{className}}</w2j-selector-item>
+            <w2j-selector-item selected="selectableAncestorInfo.tagName.selected" tag="true">{{selectableAncestorInfo.tagName.value}}</w2j-selector-item>
+            <w2j-selector-item selected="selectableAncestorInfo.id.selected" ng-if="selectableAncestorInfo.id.value">#{{selectableAncestorInfo.id.value}}</w2j-selector-item>
+            <w2j-selector-item selected="className.selected" ng-repeat="className in selectableAncestorInfo.classNames">.{{className.value}}</w2j-selector-item>
           </div>
           <md-divider ng-if="!$last"></md-divider>
         </md-list-item>
