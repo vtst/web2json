@@ -80,7 +80,7 @@ w2j.utils.PACKAGE_FILES_CACHE_ = [];
 @private {boolean}
 */
 w2j.utils.DEVELOPMENT_ = false;
-chrome.management.getSelf(function(extensionInfo) {
+if (chrome.management) chrome.management.getSelf(function(extensionInfo) {
   if (extensionInfo.installType == 'development') w2j.utils.DEVELOPMENT_ = true;
 });
 
