@@ -18,6 +18,11 @@
       </h2>
     </md-toolbar>
     <md-content>
+      <div class="w2j-header">
+        {{numberOfMatches}} element(s) match(es) this selector.
+      <md-button class="md-primary" ng-click="test()">Show</md-button>
+      </div>
+      <md-divider ng-if="!$last"></md-divider>
       <div class="w2j-selector">
         <div class="w2j-ancestor" ng-repeat="selectableAncestorInfo in selectableAncestorInfos">
           <div class="md-list-item-text">
@@ -27,7 +32,6 @@
           </div>
         </div>
       </div>
-      <md-button class="md-raised md-primary" ng-click="test()">Test</md-button>
     </md-content>
   </body>
 </html>
