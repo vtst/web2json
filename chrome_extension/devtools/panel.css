@@ -1,22 +1,19 @@
 .w2j-selector {
-  white-space: pre;
+  padding: 12px;
 }
 
 .w2j-ancestor {
-  min-height: initial;
-  height: 30px;
 }
 
 .w2j-selector-item {
-  background-color: #ddd;
-  border: solid 1px #ddd;
-  border-radius: 100px;
   display: inline-block;
-  padding: 2px 4px;
   cursor: pointer;
+  color: #aaa;
+  outline: none;
 }
 
 .w2j-selector-item:hover {
+  color: rgb(63,81,181);
 }
 
 .w2j-selector-tag {
@@ -24,6 +21,5 @@
 }
 
 .w2j-selector-item-selected {
-  background-color: rgb(63,81,181);
-  color: white;
+  color: black;
 }

@@ -19,7 +19,7 @@ w2j.panel.init = async function($scope) {
   var messageDiv = document.getElementById('message');
   async function updateElementInfo() {
     var response = await w2j.utils.evalScriptInInspectedWindow('devtools/panel_cs.js');
-    console.log(response.result);
+    response.result.reverse();
     $scope.selectableAncestorInfos = w2j.utils.map(response.result, w2j.panel.getSelectableElementInfo);
     $scope.$apply();
   }
