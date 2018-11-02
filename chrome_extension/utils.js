@@ -77,6 +77,14 @@ w2j.utils.relativeUrl = function(url, base) {
 w2j.utils.PACKAGE_FILES_CACHE_ = [];
 
 /**
+@private {boolean}
+*/
+w2j.utils.DEVELOPMENT_ = false;
+chrome.management.getSelf(function(extensionInfo) {
+  if (extensionInfo.installType == 'development') w2j.utils.DEVELOPMENT_ = true;
+});
+
+/**
 @param {string} path
 @return {string}
 */
@@ -86,8 +94,7 @@ w2j.utils.getFileContentFromPackage = async function(path) {
   const url = chrome.runtime.getURL(path);
   var response = await fetch(url);
   var text = await response.text();
-  // TODO: Cache is disabled
-  // w2j.utils.PACKAGE_FILES_CACHE_[path] = text;
+  if (!wj2.utils.DEVELOPMENT_) w2j.utils.PACKAGE_FILES_CACHE_[path] = text;
   return text;
 };
 
