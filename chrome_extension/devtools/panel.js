@@ -81,6 +81,7 @@ w2j.panel.sendMessage = async function(message) {
 };
 
 w2j.panel.getNumberOfMatches = async function(selector) {
+  if (!selector) return 0;
   var response = await w2j.panel.sendMessage({
     _w2j_: 'getNumberOfMatches',
     selector: selector
@@ -118,14 +119,14 @@ w2j.panel.onNavigated = async function() {
 @param {Scope} $scope
 */
 w2j.panel.init = async function($scope) {
+  // Page navigation
+  chrome.devtools.network.onNavigated.addListener(w2j.panel.onNavigated);
+  w2j.panel.onNavigated();
+
   // Element selection
   chrome.devtools.panels.elements.onSelectionChanged.addListener(
     w2j.panel.onSelectionChanged.bind(null, $scope));
   w2j.panel.onSelectionChanged($scope);
-
-  // Page navigation
-  chrome.devtools.network.onNavigated.addListener(w2j.panel.onNavigated);
-  w2j.panel.onNavigated();
 };
 
 // *************************************************************************
@@ -146,6 +147,10 @@ module.component('w2jSelectorItem', {
     };
   }
 });
+
+// Here is the problem:
+// When loading a new page, $scope.$watch is triggered before the content script is
+// initialized. I think it is trigerred because of onSelectionChanged
 
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
