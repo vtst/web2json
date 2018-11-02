@@ -81,13 +81,20 @@ w2j.panel.sendMessage = async function(message) {
 };
 
 w2j.panel.getNumberOfMatches = async function(selector) {
-  if (!selector) return 0;
   var response = await w2j.panel.sendMessage({
-    _w2j_: 'querySelectorAll',
+    _w2j_: 'getNumberOfMatches',
     selector: selector
   });
-  return response.numberOfElements;
+  return response.length;
 };
+
+w2j.panel.showMatches = async function(selector) {
+  await w2j.panel.sendMessage({
+    _w2j_: 'highlight',
+    selector: selector
+  });
+};
+
 
 // *************************************************************************
 // Page interaction
@@ -143,9 +150,15 @@ module.component('w2jSelectorItem', {
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
 
+  // Watches {{selectableAncestorInfos}} and update {{numberOfMatches}}
   $scope.$watch('selectableAncestorInfos', async function(newValue, oldValue) {
     var selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
     $scope.numberOfMatches = await w2j.panel.getNumberOfMatches(selector);
     $scope.$apply();
   }, true);
+
+  $scope.showMatches = function() {
+    var selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
+    w2j.panel.showMatches(selector);
+  };
 });
