@@ -17,6 +17,8 @@ w2j.panel.getSelectableElementInfo = function(elementInfo) {
 
 w2j.panel.init = async function($scope) {
   var messageDiv = document.getElementById('message');
+
+  // Element selection
   async function updateElementInfo() {
     var response = await w2j.utils.evalScriptInInspectedWindow('devtools/panel_eval.js');
     response.result.reverse();
@@ -25,6 +27,26 @@ w2j.panel.init = async function($scope) {
   }
   updateElementInfo();
   chrome.devtools.panels.elements.onSelectionChanged.addListener(updateElementInfo);
+
+  // Page navigation
+  async function injectScripts() {
+    await chromp.tabs.executeScript(chrome.devtools.inspectedWindow.tabId, {file: 'utils.js'});
+    await chromp.tabs.executeScript(chrome.devtools.inspectedWindow.tabId, {file: 'devtools/panel_cs.js'});    
+  }
+  chrome.devtools.network.onNavigated.addListener(injectScripts);
+  injectScripts();
+};
+
+w2j.panel.sendMessage = async function(message) {
+  return await chromp.tabs.sendMessage(chrome.devtools.inspectedWindow.tabId, message);
+};
+
+w2j.panel.querySelectorAll = async function(selector) {
+  var response = await w2j.panel.sendMessage({
+    _w2j_: 'querySelectorAll',
+    selector: selector
+  });
+  return response.numberOfElements;
 };
 
 // *************************************************************************
@@ -48,6 +70,7 @@ module.component('w2jSelectorItem', {
 
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
+
   function formatSelectableAncestorInfo(selectableAncestorInfo) {
     var s = '';
     console.log(selectableAncestorInfo);
@@ -59,9 +82,20 @@ module.controller('PanelCtrl', function($scope) {
     if (s) s += '\n';
     return s;
   }
+
+  function formatSelectableAncestorInfos(selectableAncestorInfos) {
+    return w2j.utils.map(selectableAncestorInfos || [], formatSelectableAncestorInfo).join('');
+  }
+
   $scope.formatSelection = function(selectableAncestorInfos) {
     var strings = w2j.utils.map(selectableAncestorInfos || [], formatSelectableAncestorInfo);
     strings.reverse();
     return strings.join('');
   }
+
+  $scope.test = async function() {
+    var selector = formatSelectableAncestorInfos($scope.selectableAncestorInfos);
+    var n = await w2j.panel.querySelectorAll(selector);
+    alert(n + ' element(s) match(es) this selector');
+  };
 });
