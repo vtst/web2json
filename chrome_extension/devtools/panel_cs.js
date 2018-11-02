@@ -1,6 +1,9 @@
 var w2j = w2j || {};
 w2j.panel_cs = {};
 
+// *************************************************************************
+// Highlighting
+
 /**
 @param {Element} el
 @return {{top: number, left: number}}
@@ -25,6 +28,47 @@ w2j.panel_cs.getMaximumZIndex = function() {
   return result;
 };
 
+/**
+@constructor
+*/
+w2j.panel_cs.Highlighter = function() {
+  /** @private {Array.<Element>} */
+  this.overlays_ = [];
+};
+
+w2j.panel_cs.Highlighter.prototype.clear = function() {
+  w2j.utils.forEach(this.overlays_, function(overlay) {
+    overlay.parentNode.removeChild(overlay);
+  });
+  this.overlays_.length = 0;
+};
+
+/**
+@param {Element} element
+*/
+w2j.panel_cs.Highlighter.prototype.set = function(elements) {
+  this.clear();
+  var zIndex = w2j.panel_cs.getMaximumZIndex() + 1;
+  w2j.utils.forEach(elements, function(element) {
+    var offset = w2j.panel_cs.getElementOffset(element);
+    var div = document.createElement('div');
+    div.style.background = 'rgba(255, 0, 0, .5)';
+    div.style.position = 'absolute';
+    div.style.top = offset.top + 'px';
+    div.style.left = offset.left + 'px';
+    div.style.width = element.offsetWidth + 'px';
+    div.style.height = element.offsetHeight + 'px';
+    div.style.zIndex = zIndex;
+    document.body.appendChild(div);
+    this.overlays_.push(div);
+  }, this);
+};
+
+w2j.panel_cs.HIGHLIGHTER = new w2j.panel_cs.Highlighter;
+
+// *************************************************************************
+// Message listener
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   switch (request._w2j_) {
     case 'getNumberOfMatches':
@@ -33,19 +77,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       break;
     case 'highlight':
       var elements = request.selector ? document.querySelectorAll(request.selector) : [];
-      var zIndex = w2j.panel_cs.getMaximumZIndex() + 1;
-      w2j.utils.forEach(elements, function(element) {
-        var offset = w2j.panel_cs.getElementOffset(element);
-        var div = document.createElement('div');
-        div.style.background = 'rgba(255, 0, 0, .5)';
-        div.style.position = 'absolute';
-        div.style.top = offset.top + 'px';
-        div.style.left = offset.left + 'px';
-        div.style.width = element.offsetWidth + 'px';
-        div.style.height = element.offsetHeight + 'px';
-        div.style.zIndex = zIndex;
-        document.body.appendChild(div);
-      });
+      w2j.panel_cs.HIGHLIGHTER.set(elements);
       sendResponse({});
       break;
     default:
