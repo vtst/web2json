@@ -94,7 +94,7 @@ w2j.utils.getFileContentFromPackage = async function(path) {
   const url = chrome.runtime.getURL(path);
   var response = await fetch(url);
   var text = await response.text();
-  if (!wj2.utils.DEVELOPMENT_) w2j.utils.PACKAGE_FILES_CACHE_[path] = text;
+  if (!w2j.utils.DEVELOPMENT_) w2j.utils.PACKAGE_FILES_CACHE_[path] = text;
   return text;
 };
 
