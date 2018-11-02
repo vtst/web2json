@@ -21,6 +21,22 @@ w2j.utils.map = function(arr, fn, opt_obj) {
 
 /**
 @param {Array.<T>} arr
+@param {function(this: C, T, number): boolean} fn
+@param {?C} opt_obj
+@return {Array.<T>}
+@template C, T
+*/
+w2j.utils.filter = function(arr, fn, opt_obj) {
+  var result = [];
+  for (var i = 0; i < arr.length; ++i) {
+    var elt = arr[i];
+    if (fn.call(opt_obj, elt, i)) result.push(elt);
+  }
+  return result;
+};
+
+/**
+@param {Array.<T>} arr
 @param {function(this: C, T, number)} fn
 @param {?C} opt_obj
 @template C, T
