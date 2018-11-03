@@ -154,6 +154,7 @@ module.component('w2jSelectorItem', {
 
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
+  $scope.selectedTab = 0;
 
   // Watches {{selectableAncestorInfos}} and update {{numberOfMatches}}
   $scope.$watch('selectableAncestorInfos', async function(newValue, oldValue) {
@@ -166,4 +167,12 @@ module.controller('PanelCtrl', function($scope) {
     var selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
     w2j.panel.showMatches(selector);
   };
+
+  $scope.showPreviousTab = function() {
+    --$scope.selectedTab;
+  }
+
+  $scope.showNextTab = function() {
+    ++$scope.selectedTab;
+  }
 });
