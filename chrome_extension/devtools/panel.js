@@ -107,6 +107,7 @@ w2j.panel.onSelectionChanged = async function($scope) {
   var response = await w2j.utils.evalScriptInInspectedWindow('devtools/panel_eval.js');
   response.result.reverse();
   $scope.selectableAncestorInfos = w2j.utils.map(response.result, w2j.panel.getSelectableElementInfo);
+  if ($scope.selectedTab == 0) $scope.selectedTab = 1;
   $scope.$apply();
 };
 
@@ -127,6 +128,13 @@ w2j.panel.init = async function($scope) {
   chrome.devtools.panels.elements.onSelectionChanged.addListener(
     w2j.panel.onSelectionChanged.bind(null, $scope));
   w2j.panel.onSelectionChanged($scope);
+};
+
+/**
+@param {Scope} $scope
+*/
+w2j.panel.updateMatches = function($scope) {
+  w2j.panel.showMatches($scope.showMatches ? $scope.selector : null);
 };
 
 // *************************************************************************
@@ -158,21 +166,25 @@ module.controller('PanelCtrl', function($scope) {
 
   // Watches {{selectableAncestorInfos}} and update {{numberOfMatches}}
   $scope.$watch('selectableAncestorInfos', async function(newValue, oldValue) {
-    var selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
-    $scope.numberOfMatches = await w2j.panel.getNumberOfMatches(selector);
+    $scope.selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
+    $scope.numberOfMatches = await w2j.panel.getNumberOfMatches($scope.selector);
     $scope.$apply();
+    w2j.panel.updateMatches($scope);
   }, true);
 
-  $scope.showMatches = function() {
-    var selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
-    w2j.panel.showMatches(selector);
-  };
+  // Watches {{showMatches}}
+  $scope.$watch('showMatches', async function(newValue, oldValue) {
+    w2j.panel.updateMatches($scope);
+  });
 
-  $scope.showPreviousTab = function() {
-    --$scope.selectedTab;
-  }
+  $scope.$watch('selectedTab', async function(newValue, oldValue) {
+    if ($scope.selectedTab == 0) {
+      $scope.showMatches = false;
+      $scope.$apply();
+    }
+  });
 
-  $scope.showNextTab = function() {
-    ++$scope.selectedTab;
+  $scope.showTab = function(steps) {
+    $scope.selectedTab += steps;
   }
 });
