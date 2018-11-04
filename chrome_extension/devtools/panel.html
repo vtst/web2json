@@ -59,9 +59,9 @@
               </div>
             </div>
             <div layout="row" layout-align="end center">
-              <md-button class="md-raised md-small" ng-click="showMatches = !showMatches">
+              <md-button class="md-raised" ng-click="showMatches = !showMatches">
                 {{showMatches ? 'Hide' : 'Show'}} matches</md-button>
-              <md-button class="md-raised md-primary md-small" ng-click="selectedTab = 2">OK</md-button>
+              <md-button class="md-raised md-primary" ng-click="selectedTab = 2">OK</md-button>
             </div>
           </md-content>
         </md-tab>
@@ -70,8 +70,11 @@
             Congratulations! You are done. Here is your selector:
             <md-input-container class="md-block">
               <label>Selector</label>
-              <textarea ng-model="selector" md-select-on-focus></textarea>
+              <textarea readonly id="selector" ng-model="selector" md-select-on-focus></textarea>
             </md-input-container>
+            <div layout="row" layout-align="end center">
+              <md-button class="md-raised md-primary" ng-click="copySelectorToClipboard();">Copy to clipboard</md-button>
+            </div>
           </md-content>
         </md-tab>
       </md-tabs>

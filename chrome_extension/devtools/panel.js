@@ -193,4 +193,9 @@ module.controller('PanelCtrl', function($scope) {
   $scope.showTab = function(steps) {
     $scope.selectedTab += steps;
   }
+
+  $scope.copySelectorToClipboard = function() {
+    document.getElementById('selector').select();
+    document.execCommand('copy');
+  }
 });
