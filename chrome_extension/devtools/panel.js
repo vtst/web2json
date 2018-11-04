@@ -107,11 +107,17 @@ w2j.panel.onSelectionChanged = async function($scope) {
   var response = await w2j.utils.evalScriptInInspectedWindow('devtools/panel_eval.js');
   response.result.reverse();
   $scope.selectableAncestorInfos = w2j.utils.map(response.result, w2j.panel.getSelectableElementInfo);
-  if ($scope.selectedTab == 0) $scope.selectedTab = 1;
+  if ($scope.justNavigated) {
+    $scope.justNavigated = false;
+  } else {
+    if ($scope.selectedTab == 0) $scope.selectedTab = 1;
+  }
   $scope.$apply();
 };
 
-w2j.panel.onNavigated = async function() {
+w2j.panel.onNavigated = async function($scope) {
+  $scope.justNavigated = true;
+  $scope.selectedTab = 0;
   await chromp.tabs.executeScript(chrome.devtools.inspectedWindow.tabId, {file: 'utils.js'});
   await chromp.tabs.executeScript(chrome.devtools.inspectedWindow.tabId, {file: 'devtools/panel_cs.js'});    
 };
@@ -121,8 +127,8 @@ w2j.panel.onNavigated = async function() {
 */
 w2j.panel.init = async function($scope) {
   // Page navigation
-  chrome.devtools.network.onNavigated.addListener(w2j.panel.onNavigated);
-  w2j.panel.onNavigated();
+  chrome.devtools.network.onNavigated.addListener(w2j.panel.onNavigated.bind(null, $scope));
+  w2j.panel.onNavigated($scope);
 
   // Element selection
   chrome.devtools.panels.elements.onSelectionChanged.addListener(

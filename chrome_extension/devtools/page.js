@@ -1,4 +1,4 @@
-chrome.devtools.panels.create("My Panel",
+chrome.devtools.panels.create("Selector Builder",
     "",
     "devtools/panel.html",
     function(panel) {
