@@ -54,7 +54,8 @@
                 <div class="md-list-item-text">
                   <w2j-selector-item selected="selectableAncestorInfo.tagName.selected" tag="true">{{selectableAncestorInfo.tagName.value}}</w2j-selector-item><!--
                   --><w2j-selector-item selected="selectableAncestorInfo.id.selected" ng-if="selectableAncestorInfo.id.value">#{{selectableAncestorInfo.id.value}}</w2j-selector-item><!--
-                  --><w2j-selector-item selected="className.selected" ng-repeat="className in selectableAncestorInfo.classNames">.{{className.value}}</w2j-selector-item>
+                  --><w2j-selector-item selected="className.selected" ng-repeat="className in selectableAncestorInfo.classNames">.{{className.value}}</w2j-selector-item><!--
+                  --><w2j-selector-item selected="className.selected" ng-repeat="attribute in selectableAncestorInfo.attributes">[{{attribute.value}}]</w2j-selector-item>
                 </div>
               </div>
             </div>

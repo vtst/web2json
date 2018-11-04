@@ -8,7 +8,8 @@ w2j.panel = {};
 @typedef {
   tagName: string,
   id: string,
-  classNames: Array.<string>
+  classNames: Array.<string>,
+  attributes: Array.<string>
 }
 */
 w2j.panel.ElementInfo;
@@ -20,7 +21,8 @@ w2j.panel.Selectable;
 @typedef {
   tagName: w2j.panel.Selectable,
   id: w2j.panel.Selectable,
-  classNames: Array.<w2j.panel.Selectable>
+  classNames: Array.<w2j.panel.Selectable>,
+  attributes: Array.<w2h.panel.Selectable>
 }
 */
 w2j.panel.SelectableElementInfo;
@@ -44,7 +46,8 @@ w2j.panel.getSelectableElementInfo = function(elementInfo) {
   return {
     tagName: w2j.panel.getSelectable(elementInfo.tagName),
     id: w2j.panel.getSelectable(elementInfo.id),
-    classNames: w2j.utils.map(elementInfo.classNames, w2j.panel.getSelectable)
+    classNames: w2j.utils.map(elementInfo.classNames, w2j.panel.getSelectable),
+    attributes: w2j.utils.map(elementInfo.attributes, w2j.panel.getSelectable)
   };
 };
 
@@ -58,6 +61,9 @@ w2j.panel.formatSelectableAncestorInfo = function(selectableAncestorInfo) {
   if (selectableAncestorInfo.id.selected) s += '#' + selectableAncestorInfo.id.value;
   w2j.utils.forEach(selectableAncestorInfo.classNames, function(className) {
     if (className.selected) s += '.' + className.value;
+  });
+  w2j.utils.forEach(selectableAncestorInfo.attributes, function(attribute) {
+    if (attribute.selected) s += '[' + attribute.value + ']';
   });
   return s;
 }

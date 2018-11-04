@@ -13,6 +13,26 @@ w2j.panel_cs.getClassNames = function(element) {
   return classNames;  
 };
 
+/** @private {Object.<string, boolean>} */
+w2j.panel_cs.ATTRIBUTES_ = {
+  'name': true
+};
+
+/**
+@param {Element} element
+@return {Array.<string>}
+*/
+w2j.panel_cs.getAttributes = function(element) {
+  var result = [];
+  for (var i = 0; i < element.attributes.length; ++i) {
+    var attribute = element.attributes[i];
+    if (w2j.panel_cs.ATTRIBUTES_[attribute.name]) {
+      result.push(attribute.name + '="' + attribute.value + '"');
+    }
+  }
+  return result;
+};
+
 /**
 @param {Element} element
 @return {w2j.panel.ElementInfo}
@@ -20,8 +40,9 @@ w2j.panel_cs.getClassNames = function(element) {
 w2j.panel_cs.inspectElement = function(element) {
   return {
     tagName: element.tagName.toLowerCase(),
+    id: element.id,
     classNames: w2j.panel_cs.getClassNames(element),
-    id: element.id
+    attributes: w2j.panel_cs.getAttributes(element)
   };
 };
 
