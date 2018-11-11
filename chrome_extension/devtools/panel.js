@@ -69,14 +69,15 @@ w2j.panel.formatSelectableAncestorInfo = function(selectableAncestorInfo) {
 }
 
 /**
-@param {Array.<w2j.panel.SelectableElementInfo>}
+@param {Array.<w2j.panel.SelectableElementInfo>} selectableAncestorInfos
+@param {boolean} lineBreaks
 @return {string}
 */
-w2j.panel.formatSelectableAncestorInfos = function(selectableAncestorInfos) {
+w2j.panel.formatSelectableAncestorInfos = function(selectableAncestorInfos, lineBreaks) {
   return w2j.utils.filter(
     w2j.utils.map(selectableAncestorInfos, w2j.panel.formatSelectableAncestorInfo),
     function(s) { return s; }
-    ).join('\n');
+    ).join(lineBreaks ? '\n' : ' ');
 }
 
 // *************************************************************************
@@ -175,14 +176,20 @@ module.component('w2jSelectorItem', {
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
   $scope.selectedTab = 0;
+  $scope.selectorLineBreaks = false;
+
+  function updateSelector() {
+    $scope.selector = w2j.panel.formatSelectableAncestorInfos(
+      $scope.selectableAncestorInfos || [], $scope.selectorLineBreaks);
+  }
 
   // Watches {{selectableAncestorInfos}} and update {{numberOfMatches}}
-  $scope.$watch('selectableAncestorInfos', async function(newValue, oldValue) {
-    $scope.selector = w2j.panel.formatSelectableAncestorInfos($scope.selectableAncestorInfos || []);
+  $scope.$watch('selectableAncestorInfos', async function() {
+    updateSelector();
     $scope.numberOfMatches = await w2j.panel.getNumberOfMatches($scope.selector);
-    $scope.$apply();
     w2j.panel.updateMatches($scope);
   }, true);
+  $scope.$watch('selectorLineBreaks', updateSelector);
 
   // Watches {{showMatches}}
   $scope.$watch('showMatches', async function(newValue, oldValue) {

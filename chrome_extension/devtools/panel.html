@@ -73,7 +73,11 @@
               <label>Selector</label>
               <textarea readonly id="selector" ng-model="selector" md-select-on-focus></textarea>
             </md-input-container>
-            <div layout="row" layout-align="end center">
+            <div layout="row" layout-align="center center">
+              <md-switch ng-model="selectorLineBreaks" aria-label="Line breaks">
+                Line breaks
+              </md-switch>
+              <div flex></div>
               <md-button class="md-raised md-primary" ng-click="copySelectorToClipboard();">Copy to clipboard</md-button>
             </div>
           </md-content>
