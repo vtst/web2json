@@ -192,7 +192,6 @@ module.controller('PanelCtrl', function($scope) {
   $scope.$watch('selectedTab', async function(newValue, oldValue) {
     if ($scope.selectedTab == 0) {
       $scope.showMatches = false;
-      $scope.$apply();
     }
   });
 

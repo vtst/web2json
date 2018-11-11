@@ -1,5 +1,7 @@
 # Code health:
 * [Bug] Are we injecting engine_cs.js several times?
+* [Bug] Escaping of class names and attribute values in panel_eval.js
+* Simplify code that displays selector
 
 # Engine:
 * (?) Can we use the background page instead of creating a tab?
@@ -9,7 +11,7 @@
 * Crawling
 
 # User interface:
-* Pick element in page
+* Pick attributes
 * Automatically suggest selectors
 * Visual edition of the script
 * Export into a spreadsheet
