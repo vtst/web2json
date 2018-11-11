@@ -169,10 +169,6 @@ module.component('w2jSelectorItem', {
   }
 });
 
-// Here is the problem:
-// When loading a new page, $scope.$watch is triggered before the content script is
-// initialized. I think it is trigerred because of onSelectionChanged
-
 module.controller('PanelCtrl', function($scope) {
   w2j.panel.init($scope);
   $scope.selectedTab = 0;
