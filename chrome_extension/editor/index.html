@@ -3,6 +3,7 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
     <link rel="stylesheet" href="index.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.41.0/codemirror.min.css" rel="stylesheet">
   </head>
   <body ng-app="EditorApp" ng-controller="EditorCtrl" ng-cloak>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
@@ -10,6 +11,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.41.0/codemirror.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.41.0/mode/javascript/javascript.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-codemirror/0.3.0/ui-codemirror.js"></script>
     <script type="text/javascript" src="../utils.js"></script>
     <script type="text/javascript" src="index.js"></script>
 
@@ -18,8 +22,12 @@
         <h2 flex md-truncate>Script Editor</h2>
       </div>
     </md-toolbar>
-    <md-content>
+    <md-content id="content">
       Hello!
+      <div style="border: solid 1px red;">
+        <textarea id="editor" ng-cloak></textarea>
+      </div>
+
     </md-content>
   </body>
 </html>
