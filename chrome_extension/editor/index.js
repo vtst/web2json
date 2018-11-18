@@ -34,12 +34,6 @@ module.directive("w2jCodemirror", function () {
         viewportMargin: Infinity
       });
     },
-    bindToController: true,
-    controller: function($element, $timeout) {
-      $timeout(function() {
-      }, 1000);
-      this.$postLink = function() {
-      }
-    }
+    bindToController: true
   };
 });
