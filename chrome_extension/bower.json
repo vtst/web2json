@@ -1,0 +1,19 @@
+{
+  "name": "web2json-chrome",
+  "homepage": "https://github.com/vtst/web2json",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-material": "^1.1.10",
+    "codemirror": "^5.41.0"
+  }
+}
