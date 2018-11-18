@@ -1,0 +1,10 @@
+#editor-container {
+  border: solid 1px #aaa;
+  margin: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+#editor-container .CodeMirror {
+  flex-grow: 1;
+}

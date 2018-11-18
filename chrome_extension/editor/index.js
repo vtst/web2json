@@ -6,7 +6,8 @@ function initCodeMirror(textArea) {
     if (!textArea.classList.contains('ng-cloak')) {
       window.clearInterval(timeout.id);
       CodeMirror.fromTextArea(textArea, {
-        lineNumbers: true
+        lineNumbers: true,
+        viewportMargin: Infinity
       });
     }
   }, 10);
